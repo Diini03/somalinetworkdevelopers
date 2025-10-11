@@ -2,8 +2,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { X, SlidersHorizontal } from "lucide-react";
+import { X, SlidersHorizontal, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 interface FilterSidebarProps {
   filters: {
@@ -80,29 +86,35 @@ export const FilterSidebar = ({
         />
       </div>
 
-      {/* Skills Filter */}
-      <div className="space-y-3">
-        <Label className="text-sm font-semibold">Skills</Label>
-        <div className="flex flex-wrap gap-2">
-          {availableSkills.map((skill) => (
-            <Badge
-              key={skill}
-              variant={filters.skills.includes(skill) ? "default" : "outline"}
-              className={`cursor-pointer transition-all duration-200 ${
-                filters.skills.includes(skill)
-                  ? "bg-primary text-primary-foreground glow-accent-sm hover:opacity-90"
-                  : "hover:bg-secondary border-border/50"
-              }`}
-              onClick={() => toggleSkill(skill)}
-            >
-              {skill}
-              {filters.skills.includes(skill) && (
-                <X className="w-3 h-3 ml-1" />
-              )}
-            </Badge>
-          ))}
-        </div>
-      </div>
+      {/* Skills Filter - Collapsible */}
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="skills" className="border-border/50">
+          <AccordionTrigger className="text-sm font-semibold hover:no-underline py-2">
+            Skills
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {availableSkills.map((skill) => (
+                <Badge
+                  key={skill}
+                  variant={filters.skills.includes(skill) ? "default" : "outline"}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    filters.skills.includes(skill)
+                      ? "bg-primary text-primary-foreground glow-accent-sm hover:opacity-90"
+                      : "hover:bg-secondary border-border/50"
+                  }`}
+                  onClick={() => toggleSkill(skill)}
+                >
+                  {skill}
+                  {filters.skills.includes(skill) && (
+                    <X className="w-3 h-3 ml-1" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       {/* Location Filter */}
       <div className="space-y-2">

@@ -49,12 +49,16 @@ export const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
-            <Button variant="ghost" className="font-medium">
-              Login
-            </Button>
-            <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105">
-              Sign Up
-            </Button>
+            <Link to="/login">
+              <Button variant="ghost" className="font-medium">
+                Login
+              </Button>
+            </Link>
+            <Link to="/signup">
+              <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105">
+                Sign Up
+              </Button>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
@@ -90,12 +94,16 @@ export const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 space-y-2">
-              <Button variant="ghost" className="w-full font-medium">
-                Login
-              </Button>
-              <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold">
-                Sign Up
-              </Button>
+              <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full font-medium">
+                  Login
+                </Button>
+              </Link>
+              <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
+                <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold">
+                  Sign Up
+                </Button>
+              </Link>
             </div>
           </div>
         </div>

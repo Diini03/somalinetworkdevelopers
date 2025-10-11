@@ -10,6 +10,26 @@ interface HeroProps {
 export const Hero = ({ onSearch }: HeroProps) => {
   return (
     <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+      {/* Animated 3D Background */}
+      <div className="absolute inset-0 z-0 opacity-10">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.3 }} />
+              <stop offset="100%" style={{ stopColor: 'hsl(var(--primary-glow))', stopOpacity: 0.1 }} />
+            </linearGradient>
+          </defs>
+          <g className="animate-[spin_20s_linear_infinite] origin-center" style={{ transformOrigin: '50% 50%' }}>
+            <circle cx="20%" cy="30%" r="100" fill="url(#grad1)" opacity="0.3" />
+            <circle cx="80%" cy="70%" r="150" fill="url(#grad1)" opacity="0.2" />
+          </g>
+          <g className="animate-[spin_15s_linear_infinite_reverse] origin-center" style={{ transformOrigin: '50% 50%' }}>
+            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.15" transform="translate(200, 100)" />
+            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.15" transform="translate(600, 400) scale(1.5)" />
+          </g>
+        </svg>
+      </div>
+
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
         <img
