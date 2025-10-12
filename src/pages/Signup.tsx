@@ -12,6 +12,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -58,6 +59,9 @@ const Signup = () => {
         password: formData.password,
         options: {
           emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            name: formData.name,
+          },
         },
       });
 
@@ -109,6 +113,19 @@ const Signup = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="glass border-border/50"
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
