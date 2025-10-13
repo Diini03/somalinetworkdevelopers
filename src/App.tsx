@@ -12,6 +12,9 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
+import { AdminDashboard } from "./pages/admin/Dashboard";
+import { CandidatesManagement } from "./pages/admin/CandidatesManagement";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +33,22 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedAdminRoute>
+                <AdminDashboard />
+              </ProtectedAdminRoute>
+            }
+          />
+          <Route
+            path="/admin/candidates"
+            element={
+              <ProtectedAdminRoute>
+                <CandidatesManagement />
+              </ProtectedAdminRoute>
+            }
+          />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -1,5 +1,7 @@
 import { Candidate } from "@/types/candidate";
 
+// This file is kept for type reference only
+// Candidates are now stored in the database
 export const candidates: Candidate[] = [
   {
     id: "1",

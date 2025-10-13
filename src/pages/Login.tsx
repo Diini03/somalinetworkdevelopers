@@ -20,7 +20,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -31,12 +31,26 @@ const Login = () => {
           description: error.message,
           variant: "destructive",
         });
-      } else {
+      } else if (data.user) {
+        // Check if user is admin
+        const { data: roleData } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in.",
         });
-        navigate("/profile");
+
+        // Redirect based on role
+        if (roleData) {
+          navigate("/admin");
+        } else {
+          navigate("/profile");
+        }
       }
     } catch (error) {
       toast({
