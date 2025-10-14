@@ -1,8 +1,10 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { candidates } from "@/data/candidates";
+import { supabase } from "@/integrations/supabase/client";
+import { Candidate } from "@/types/candidate";
 import {
   MapPin,
   Banknote,
@@ -19,7 +21,58 @@ import {
 const ProfileDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const candidate = candidates.find((c) => c.id === id);
+  const [candidate, setCandidate] = useState<Candidate | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCandidate = async () => {
+      if (!id) return;
+
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (!error && data) {
+        const transformedData: Candidate = {
+          id: data.id,
+          name: data.name,
+          title: data.title,
+          photo: data.photo,
+          skills: data.skills,
+          expectedSalary: {
+            min: data.expected_salary_min,
+            max: data.expected_salary_max,
+          },
+          location: data.location,
+          qualification: data.qualification,
+          bio: data.bio,
+          email: data.email,
+          linkedin: data.linkedin,
+          github: data.github,
+          portfolio: data.portfolio,
+          experience: data.experience,
+          availability: data.availability,
+        };
+        setCandidate(transformedData);
+      }
+      setLoading(false);
+    };
+
+    fetchCandidate();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="container mx-auto px-4 pt-32 flex justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   if (!candidate) {
     return (

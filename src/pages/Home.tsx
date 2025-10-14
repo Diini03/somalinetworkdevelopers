@@ -1,11 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { FilterSidebar } from "@/components/FilterSidebar";
 import { CandidateGrid } from "@/components/CandidateGrid";
-import { candidates } from "@/data/candidates";
+import { supabase } from "@/integrations/supabase/client";
+import { Candidate } from "@/types/candidate";
 
 const Home = () => {
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     name: "",
     skills: [] as string[],
@@ -17,6 +20,42 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  useEffect(() => {
+    const fetchCandidates = async () => {
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (!error && data) {
+        const transformedData: Candidate[] = data.map((c) => ({
+          id: c.id,
+          name: c.name,
+          title: c.title,
+          photo: c.photo,
+          skills: c.skills,
+          expectedSalary: {
+            min: c.expected_salary_min,
+            max: c.expected_salary_max,
+          },
+          location: c.location,
+          qualification: c.qualification,
+          bio: c.bio,
+          email: c.email,
+          linkedin: c.linkedin,
+          github: c.github,
+          portfolio: c.portfolio,
+          experience: c.experience,
+          availability: c.availability,
+        }));
+        setCandidates(transformedData);
+      }
+      setLoading(false);
+    };
+
+    fetchCandidates();
+  }, []);
+
   // Get all unique skills
   const availableSkills = useMemo(() => {
     const skillSet = new Set<string>();
@@ -24,7 +63,7 @@ const Home = () => {
       candidate.skills.forEach((skill) => skillSet.add(skill));
     });
     return Array.from(skillSet).sort();
-  }, []);
+  }, [candidates]);
 
   // Filter candidates
   const filteredCandidates = useMemo(() => {
@@ -79,7 +118,7 @@ const Home = () => {
 
       return true;
     });
-  }, [filters, searchQuery]);
+  }, [candidates, filters, searchQuery]);
 
   const clearFilters = () => {
     setFilters({
@@ -110,7 +149,13 @@ const Home = () => {
 
           {/* Main Content */}
           <main className="flex-1 lg:pl-8">
-            <CandidateGrid candidates={filteredCandidates} />
+            {loading ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              </div>
+            ) : (
+              <CandidateGrid candidates={filteredCandidates} />
+            )}
           </main>
         </div>
       </div>
