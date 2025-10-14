@@ -15,6 +15,8 @@ interface CandidateFormProps {
 export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormProps) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>("");
   const [formData, setFormData] = useState({
     name: "",
     title: "",
@@ -61,59 +63,99 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
             experience: data.experience,
             availability: data.availability,
           });
+          setPhotoPreview(data.photo);
         }
       };
       fetchCandidate();
     }
   }, [candidate]);
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const candidateData = {
-      name: formData.name,
-      title: formData.title,
-      photo: formData.photo,
-      skills: formData.skills.split(",").map(s => s.trim()),
-      expected_salary_min: parseInt(formData.expected_salary_min),
-      expected_salary_max: parseInt(formData.expected_salary_max),
-      location: formData.location,
-      qualification: formData.qualification,
-      bio: formData.bio,
-      email: formData.email,
-      linkedin: formData.linkedin || null,
-      github: formData.github || null,
-      portfolio: formData.portfolio || null,
-      experience: formData.experience,
-      availability: formData.availability,
-    };
+    try {
+      let photoUrl = formData.photo;
 
-    let error;
-    if (candidate) {
-      ({ error } = await supabase
-        .from("candidates")
-        .update(candidateData)
-        .eq("id", candidate.id));
-    } else {
-      ({ error } = await supabase.from("candidates").insert(candidateData));
-    }
+      // Upload photo if a new file is selected
+      if (photoFile) {
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        const filePath = fileName;
 
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('candidate-photos')
+          .upload(filePath, photoFile);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('candidate-photos')
+          .getPublicUrl(filePath);
+
+        photoUrl = publicUrl;
+      }
+
+      const candidateData = {
+        name: formData.name,
+        title: formData.title,
+        photo: photoUrl,
+        skills: formData.skills.split(",").map(s => s.trim()),
+        expected_salary_min: parseInt(formData.expected_salary_min),
+        expected_salary_max: parseInt(formData.expected_salary_max),
+        location: formData.location,
+        qualification: formData.qualification,
+        bio: formData.bio,
+        email: formData.email,
+        linkedin: formData.linkedin || null,
+        github: formData.github || null,
+        portfolio: formData.portfolio || null,
+        experience: formData.experience,
+        availability: formData.availability,
+      };
+
+      let error;
+      if (candidate) {
+        ({ error } = await supabase
+          .from("candidates")
+          .update(candidateData)
+          .eq("id", candidate.id));
+      } else {
+        ({ error } = await supabase.from("candidates").insert(candidateData));
+      }
+
+      if (error) {
+        throw error;
+      }
+
       toast({
         title: "Success",
         description: `Candidate ${candidate ? "updated" : "added"} successfully`,
       });
       onSuccess();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -134,8 +176,23 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="photo">Photo URL *</Label>
-        <Input id="photo" value={formData.photo} onChange={handleChange} required />
+        <Label htmlFor="photo">Photo *</Label>
+        <Input 
+          id="photo" 
+          type="file" 
+          accept="image/*"
+          onChange={handlePhotoChange}
+          required={!candidate && !photoPreview}
+        />
+        {photoPreview && (
+          <div className="mt-2">
+            <img 
+              src={photoPreview} 
+              alt="Preview" 
+              className="w-32 h-32 object-cover rounded-lg"
+            />
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
