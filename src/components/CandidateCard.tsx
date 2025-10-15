@@ -3,7 +3,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, ArrowRight, Linkedin, Github, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
-import { ContactForm } from "./ContactForm";
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -89,21 +88,9 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 w-full pt-2">
-          <ContactForm
-            candidateEmail={candidate.email}
-            candidateName={candidate.name}
-            trigger={
-              <Button
-                className="flex-1 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
-                size="lg"
-              >
-                Connect
-              </Button>
-            }
-          />
-          <Link to={`/profile/${candidate.id}`} className="flex-1">
+        {/* Action Button */}
+        <div className="w-full pt-2">
+          <Link to={`/profile/${candidate.id}`} className="block">
             <Button
               variant="outline"
               className="w-full font-semibold group/btn transition-all duration-300"
