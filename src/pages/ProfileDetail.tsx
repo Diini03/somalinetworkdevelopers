@@ -4,7 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
-import { Candidate } from "@/types/candidate";
+import { Candidate, ExperienceEntry } from "@/types/candidate";
 import { InlineContactForm } from "@/components/InlineContactForm";
 import {
   MapPin,
@@ -52,8 +52,9 @@ const ProfileDetail = () => {
           linkedin: data.linkedin,
           github: data.github,
           portfolio: data.portfolio,
-          experience: data.experience,
+          experience: Array.isArray(data.experience) ? (data.experience as unknown as ExperienceEntry[]) : [],
           availability: data.availability,
+          certifications: data.certifications || [],
         };
         setCandidate(transformedData);
       }
@@ -235,17 +236,27 @@ const ProfileDetail = () => {
             </div>
 
             {/* Experience */}
-            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
-              <h2 className="text-2xl font-bold">Experience</h2>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-primary" />
+            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-6">
+              <h2 className="text-2xl font-bold">Professional Experience</h2>
+              {candidate.experience.map((exp, index) => (
+                <div key={index} className="border-l-2 border-primary pl-4 space-y-2">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    {exp.startYear && (
+                      <span className="text-lg font-semibold text-primary">
+                        {exp.startYear} - {exp.endYear || "Present"}
+                      </span>
+                    )}
+                    {exp.company && (
+                      <span className="text-lg font-semibold">{exp.company}</span>
+                    )}
+                  </div>
+                  {exp.description && (
+                    <p className="text-muted-foreground leading-relaxed">
+                      {exp.description}
+                    </p>
+                  )}
                 </div>
-                <div>
-                  <p className="text-xl font-semibold">{candidate.experience}</p>
-                  <p className="text-muted-foreground">Professional Experience</p>
-                </div>
-              </div>
+              ))}
             </div>
 
             {/* Skills */}
@@ -263,6 +274,24 @@ const ProfileDetail = () => {
                 ))}
               </div>
             </div>
+
+            {/* Certifications */}
+            {candidate.certifications && candidate.certifications.length > 0 && (
+              <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
+                <h2 className="text-2xl font-bold">Certifications</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  {candidate.certifications.map((cert, index) => (
+                    <div key={index} className="group relative overflow-hidden rounded-lg border border-border/50 hover:border-primary/50 transition-all">
+                      <img
+                        src={cert}
+                        alt={`Certification ${index + 1}`}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Contact Form */}
             <InlineContactForm

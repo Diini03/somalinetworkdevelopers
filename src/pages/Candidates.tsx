@@ -44,8 +44,9 @@ const Candidates = () => {
           linkedin: c.linkedin,
           github: c.github,
           portfolio: c.portfolio,
-          experience: c.experience,
+          experience: Array.isArray(c.experience) ? (c.experience as any[]) : [],
           availability: c.availability,
+          certifications: c.certifications || [],
         }));
         setCandidates(transformedData);
       }

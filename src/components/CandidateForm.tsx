@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ExperienceEntry } from "@/types/candidate";
+import { Plus, Trash2 } from "lucide-react";
 
 interface CandidateFormProps {
   candidate?: any;
@@ -17,6 +19,12 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [certificationFiles, setCertificationFiles] = useState<File[]>([]);
+  const [certificationPreviews, setCertificationPreviews] = useState<string[]>([]);
+  const [existingCertifications, setExistingCertifications] = useState<string[]>([]);
+  const [experiences, setExperiences] = useState<ExperienceEntry[]>([
+    { startYear: null, endYear: null, company: "", description: "" }
+  ]);
   const [formData, setFormData] = useState({
     name: "",
     title: "",
@@ -31,7 +39,6 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
     linkedin: "",
     github: "",
     portfolio: "",
-    experience: "",
     availability: "",
   });
 
@@ -60,10 +67,19 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
             linkedin: data.linkedin || "",
             github: data.github || "",
             portfolio: data.portfolio || "",
-            experience: data.experience,
             availability: data.availability,
           });
           setPhotoPreview(data.photo);
+          
+          // Parse experience data
+          if (Array.isArray(data.experience) && data.experience.length > 0) {
+            setExperiences(data.experience as unknown as ExperienceEntry[]);
+          }
+          
+          // Set existing certifications
+          if (data.certifications && data.certifications.length > 0) {
+            setExistingCertifications(data.certifications);
+          }
         }
       };
       fetchCandidate();
@@ -82,6 +98,44 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
     }
   };
 
+  const handleCertificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setCertificationFiles(prev => [...prev, ...files]);
+    
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCertificationPreviews(prev => [...prev, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const removeCertificationPreview = (index: number) => {
+    setCertificationFiles(prev => prev.filter((_, i) => i !== index));
+    setCertificationPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeExistingCertification = (index: number) => {
+    setExistingCertifications(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addExperience = () => {
+    setExperiences([...experiences, { startYear: null, endYear: null, company: "", description: "" }]);
+  };
+
+  const removeExperience = (index: number) => {
+    if (experiences.length > 1) {
+      setExperiences(experiences.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateExperience = (index: number, field: keyof ExperienceEntry, value: any) => {
+    const updated = [...experiences];
+    updated[index] = { ...updated[index], [field]: value };
+    setExperiences(updated);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -95,7 +149,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
         const filePath = fileName;
 
-        const { error: uploadError, data: uploadData } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('candidate-photos')
           .upload(filePath, photoFile);
 
@@ -110,7 +164,28 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         photoUrl = publicUrl;
       }
 
-      const candidateData = {
+      // Upload certification files
+      const certificationUrls = [...existingCertifications];
+      for (const file of certificationFiles) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `cert-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('candidate-photos')
+          .upload(fileName, file);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('candidate-photos')
+          .getPublicUrl(fileName);
+
+        certificationUrls.push(publicUrl);
+      }
+
+      const candidateData: any = {
         name: formData.name,
         title: formData.title,
         photo: photoUrl,
@@ -124,8 +199,9 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         linkedin: formData.linkedin || null,
         github: formData.github || null,
         portfolio: formData.portfolio || null,
-        experience: formData.experience,
+        experience: experiences,
         availability: formData.availability,
+        certifications: certificationUrls,
       };
 
       let error;
@@ -232,15 +308,147 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         <Textarea id="bio" value={formData.bio} onChange={handleChange} required />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="experience">Experience *</Label>
-          <Input id="experience" value={formData.experience} onChange={handleChange} required />
+      <div className="space-y-2">
+        <Label htmlFor="availability">Availability *</Label>
+        <Input id="availability" value={formData.availability} onChange={handleChange} required />
+      </div>
+
+      {/* Experience Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <Label>Professional Experience *</Label>
+          <Button type="button" onClick={addExperience} size="sm" variant="outline">
+            <Plus className="w-4 h-4 mr-2" />
+            Add Experience
+          </Button>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="availability">Availability *</Label>
-          <Input id="availability" value={formData.availability} onChange={handleChange} required />
-        </div>
+        
+        {experiences.map((exp, index) => (
+          <div key={index} className="p-4 border border-border rounded-lg space-y-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-semibold">Experience #{index + 1}</span>
+              {experiences.length > 1 && (
+                <Button
+                  type="button"
+                  onClick={() => removeExperience(index)}
+                  size="sm"
+                  variant="ghost"
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label>Start Year</Label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 2015"
+                  value={exp.startYear || ""}
+                  onChange={(e) => updateExperience(index, "startYear", e.target.value ? parseInt(e.target.value) : null)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>End Year</Label>
+                <Input
+                  type="number"
+                  placeholder="e.g. 2020 or leave empty for current"
+                  value={exp.endYear || ""}
+                  onChange={(e) => updateExperience(index, "endYear", e.target.value ? parseInt(e.target.value) : null)}
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Company *</Label>
+              <Input
+                placeholder="Company Name"
+                value={exp.company}
+                onChange={(e) => updateExperience(index, "company", e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label>Description *</Label>
+              <Textarea
+                placeholder="Describe your role and responsibilities..."
+                value={exp.description}
+                onChange={(e) => updateExperience(index, "description", e.target.value)}
+                required
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Certifications Upload */}
+      <div className="space-y-2">
+        <Label htmlFor="certifications">Certifications</Label>
+        <Input
+          id="certifications"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handleCertificationChange}
+        />
+        <p className="text-sm text-muted-foreground">Upload certification images (multiple files allowed)</p>
+        
+        {/* Existing Certifications */}
+        {existingCertifications.length > 0 && (
+          <div className="mt-3">
+            <p className="text-sm font-medium mb-2">Existing Certifications:</p>
+            <div className="grid grid-cols-3 gap-2">
+              {existingCertifications.map((url, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Certification ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removeExistingCertification(index)}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* New Certification Previews */}
+        {certificationPreviews.length > 0 && (
+          <div className="mt-3">
+            <p className="text-sm font-medium mb-2">New Certifications:</p>
+            <div className="grid grid-cols-3 gap-2">
+              {certificationPreviews.map((preview, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={preview}
+                    alt={`New Certification ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-lg"
+                  />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="destructive"
+                    className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => removeCertificationPreview(index)}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
