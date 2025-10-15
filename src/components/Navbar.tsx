@@ -1,46 +1,56 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, Moon, Sun } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useTheme } from "next-themes";
 
 export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { theme, setTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserName(session.user.id);
+      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserName(session.user.id);
+      } else {
+        setUserName("");
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out.",
-      });
-      navigate("/");
+  const fetchUserName = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', userId)
+      .single();
+    
+    if (data && !error) {
+      setUserName(data.name);
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -85,23 +95,25 @@ export const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="font-medium"
+            >
+              {theme === "dark" ? (
+                <Sun className="w-5 h-5" />
+              ) : (
+                <Moon className="w-5 h-5" />
+              )}
+            </Button>
             {user ? (
-              <>
-                <Link to="/profile">
-                  <Button variant="ghost" className="font-medium">
-                    <User className="w-4 h-4 mr-2" />
-                    Profile
-                  </Button>
-                </Link>
-                <Button 
-                  variant="ghost" 
-                  className="font-medium"
-                  onClick={handleLogout}
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout
+              <Link to="/profile">
+                <Button variant="ghost" className="font-medium">
+                  <User className="w-4 h-4 mr-2" />
+                  {userName || "Profile"}
                 </Button>
-              </>
+              </Link>
             ) : (
               <>
                 <Link to="/login">
@@ -111,7 +123,7 @@ export const Navbar = () => {
                 </Link>
                 <Link to="/signup">
                   <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105">
-                    Sign Up
+                    Get Started
                   </Button>
                 </Link>
               </>
@@ -151,26 +163,30 @@ export const Navbar = () => {
               </Link>
             ))}
             <div className="pt-4 space-y-2">
+              <Button
+                variant="ghost"
+                className="w-full font-medium justify-start"
+                onClick={toggleTheme}
+              >
+                {theme === "dark" ? (
+                  <>
+                    <Sun className="w-4 h-4 mr-2" />
+                    Light Mode
+                  </>
+                ) : (
+                  <>
+                    <Moon className="w-4 h-4 mr-2" />
+                    Dark Mode
+                  </>
+                )}
+              </Button>
               {user ? (
-                <>
-                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full font-medium">
-                      <User className="w-4 h-4 mr-2" />
-                      Profile
-                    </Button>
-                  </Link>
-                  <Button 
-                    variant="ghost" 
-                    className="w-full font-medium"
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                  >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
+                <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                  <Button variant="ghost" className="w-full font-medium justify-start">
+                    <User className="w-4 h-4 mr-2" />
+                    {userName || "Profile"}
                   </Button>
-                </>
+                </Link>
               ) : (
                 <>
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
@@ -180,7 +196,7 @@ export const Navbar = () => {
                   </Link>
                   <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
                     <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold">
-                      Sign Up
+                      Get Started
                     </Button>
                   </Link>
                 </>
