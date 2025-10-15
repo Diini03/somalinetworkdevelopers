@@ -5,13 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate } from "@/types/candidate";
-import { ContactForm } from "@/components/ContactForm";
+import { InlineContactForm } from "@/components/InlineContactForm";
 import {
   MapPin,
   Banknote,
   GraduationCap,
   Clock,
-  Mail,
   ExternalLink,
   ArrowLeft,
   Linkedin,
@@ -121,10 +120,18 @@ const ProfileDetail = () => {
                 <p className="text-muted-foreground">{candidate.title}</p>
               </div>
 
-              <ContactForm
-                candidateEmail={candidate.email}
-                candidateName={candidate.name}
-              />
+              <Button
+                size="lg"
+                className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
+                onClick={() => {
+                  document.getElementById('contact-form')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center'
+                  });
+                }}
+              >
+                Contact Me
+              </Button>
 
               <div className="space-y-3 pt-4 border-t border-border/50">
                 {candidate.linkedin && (
@@ -257,30 +264,11 @@ const ProfileDetail = () => {
               </div>
             </div>
 
-            {/* CTA */}
-            <div className="glass rounded-2xl p-6 border border-primary/30 shadow-card bg-gradient-to-br from-primary/5 to-transparent">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div>
-                  <h3 className="text-xl font-bold mb-2">Interested in {candidate.name}?</h3>
-                  <p className="text-muted-foreground">
-                    Get in touch to discuss opportunities and availability.
-                  </p>
-                </div>
-                <ContactForm
-                  candidateEmail={candidate.email}
-                  candidateName={candidate.name}
-                  trigger={
-                    <Button
-                      size="lg"
-                      className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105 whitespace-nowrap"
-                    >
-                      <Mail className="w-5 h-5 mr-2" />
-                      Contact Now
-                    </Button>
-                  }
-                />
-              </div>
-            </div>
+            {/* Contact Form */}
+            <InlineContactForm
+              candidateEmail={candidate.email}
+              candidateName={candidate.name}
+            />
           </div>
         </div>
       </div>
