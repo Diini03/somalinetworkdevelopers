@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
-import { FilterSidebar } from "@/components/FilterSidebar";
+import { HorizontalFilters } from "@/components/HorizontalFilters";
 import { CandidateGrid } from "@/components/CandidateGrid";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate } from "@/types/candidate";
@@ -62,7 +62,7 @@ const Candidates = () => {
       candidate.skills.forEach((skill) => skillSet.add(skill));
     });
     return Array.from(skillSet).sort();
-  }, []);
+  }, [candidates]);
 
   // Filter candidates
   const filteredCandidates = useMemo(() => {
@@ -117,7 +117,7 @@ const Candidates = () => {
 
       return true;
     });
-  }, [filters, searchQuery]);
+  }, [candidates, filters, searchQuery]);
 
   const clearFilters = () => {
     setFilters({
@@ -150,26 +150,24 @@ const Candidates = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex gap-8">
-          {/* Filters Sidebar */}
-          <FilterSidebar
-            filters={filters}
-            onFilterChange={setFilters}
-            onClearFilters={clearFilters}
-            availableSkills={availableSkills}
-          />
+        {/* Horizontal Filters */}
+        <HorizontalFilters
+          filters={filters}
+          onFilterChange={setFilters}
+          onClearFilters={clearFilters}
+          availableSkills={availableSkills}
+        />
 
-          {/* Main Content */}
-          <main className="flex-1 lg:pl-8">
-            {loading ? (
-              <div className="flex justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-              </div>
-            ) : (
-              <CandidateGrid candidates={filteredCandidates} />
-            )}
-          </main>
-        </div>
+        {/* Main Content */}
+        <main>
+          {loading ? (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+            </div>
+          ) : (
+            <CandidateGrid candidates={filteredCandidates} variant="large" />
+          )}
+        </main>
       </div>
     </div>
   );

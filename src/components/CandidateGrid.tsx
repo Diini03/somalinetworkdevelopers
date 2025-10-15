@@ -3,9 +3,10 @@ import { CandidateCard } from "./CandidateCard";
 
 interface CandidateGridProps {
   candidates: Candidate[];
+  variant?: "default" | "large";
 }
 
-export const CandidateGrid = ({ candidates }: CandidateGridProps) => {
+export const CandidateGrid = ({ candidates, variant = "default" }: CandidateGridProps) => {
   if (candidates.length === 0) {
     return (
       <div className="glass rounded-2xl p-12 text-center border border-border/50">
@@ -31,7 +32,7 @@ export const CandidateGrid = ({ candidates }: CandidateGridProps) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className={`grid gap-6 ${variant === "large" ? "grid-cols-1 lg:grid-cols-2 gap-8" : "grid-cols-1 md:grid-cols-2 gap-6"}`}>
         {candidates.map((candidate, index) => (
           <div
             key={candidate.id}

@@ -67,10 +67,11 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
           </div>
         </div>
 
-        {/* Bio Preview */}
-        <p className="text-sm text-muted-foreground line-clamp-2">
-          {candidate.bio}
-        </p>
+        {/* Availability */}
+        <div className="flex items-center gap-2 text-sm">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+          <span className="text-muted-foreground font-medium">{candidate.availability}</span>
+        </div>
 
         {/* Action Button */}
         <Link to={`/profile/${candidate.id}`}>
