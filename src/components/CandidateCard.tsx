@@ -11,18 +11,18 @@ interface CandidateCardProps {
 export const CandidateCard = ({ candidate }: CandidateCardProps) => {
   return (
     <div className="glass rounded-2xl p-6 border border-border/50 shadow-card hover:shadow-card-hover transition-all duration-300 group animate-scale-in">
-      <div className="space-y-4">
+      <div className="space-y-4 flex flex-col items-center text-center">
         {/* Header */}
-        <div className="flex items-start gap-4">
+        <div className="flex flex-col items-center gap-3">
           <div className="relative">
             <img
               src={candidate.photo}
               alt={candidate.name}
-              className="w-20 h-20 rounded-xl object-cover ring-2 ring-border/50 group-hover:ring-primary/50 transition-all duration-300"
+              className="w-24 h-24 rounded-xl object-cover ring-2 ring-border/50 group-hover:ring-primary/50 transition-all duration-300"
             />
             <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="space-y-1">
             <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
               {candidate.name}
             </h3>
@@ -31,7 +31,7 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
         </div>
 
         {/* Skills */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 justify-center">
           {candidate.skills.slice(0, 4).map((skill) => (
             <Badge
               key={skill}
@@ -50,36 +50,26 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
 
         {/* Info Grid */}
         <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-muted-foreground justify-center">
             <Banknote className="w-4 h-4 text-primary" />
             <span>
               £{candidate.expectedSalary.min.toLocaleString()}-£
               {candidate.expectedSalary.max.toLocaleString()}
             </span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
+          <div className="flex items-center gap-2 text-muted-foreground justify-center">
             <MapPin className="w-4 h-4 text-primary" />
             <span>{candidate.location}</span>
           </div>
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <GraduationCap className="w-4 h-4 text-primary" />
-            <span>{candidate.qualification}</span>
-          </div>
-        </div>
-
-        {/* Availability */}
-        <div className="flex items-center gap-2 text-sm">
-          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          <span className="text-muted-foreground font-medium">{candidate.availability}</span>
         </div>
 
         {/* Action Button */}
-        <Link to={`/profile/${candidate.id}`}>
+        <Link to={`/profile/${candidate.id}`} className="w-full">
           <Button
             className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold group/btn transition-all duration-300"
             size="lg"
           >
-            View Profile
+            Connect
             <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
           </Button>
         </Link>
