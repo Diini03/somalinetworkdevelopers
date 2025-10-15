@@ -18,15 +18,15 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
             <img
               src={candidate.photo}
               alt={candidate.name}
-              className="w-24 h-24 rounded-xl object-cover ring-2 ring-border/50 group-hover:ring-primary/50 transition-all duration-300"
+              className="w-32 h-32 rounded-xl object-cover ring-2 ring-border/50 group-hover:ring-primary/50 transition-all duration-300"
             />
             <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
+            <h3 className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
               {candidate.name}
             </h3>
-            <p className="text-sm text-muted-foreground">{candidate.title}</p>
+            <p className="text-base text-muted-foreground">{candidate.title}</p>
           </div>
         </div>
 
