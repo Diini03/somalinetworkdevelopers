@@ -1,8 +1,9 @@
 import { Candidate } from "@/types/candidate";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Banknote, GraduationCap, ArrowRight } from "lucide-react";
+import { MapPin, ArrowRight, Linkedin, Github, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ContactForm } from "./ContactForm";
 
 interface CandidateCardProps {
   candidate: Candidate;
@@ -48,31 +49,71 @@ export const CandidateCard = ({ candidate }: CandidateCardProps) => {
           )}
         </div>
 
-        {/* Info Grid */}
-        <div className="space-y-2 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground justify-center">
-            <Banknote className="w-4 h-4 text-primary" />
-            <span>
-              £{candidate.expectedSalary.min.toLocaleString()}-£
-              {candidate.expectedSalary.max.toLocaleString()}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 text-muted-foreground justify-center">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span>{candidate.location}</span>
-          </div>
+        {/* Location */}
+        <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
+          <MapPin className="w-4 h-4 text-primary" />
+          <span>{candidate.location}</span>
         </div>
 
-        {/* Action Button */}
-        <Link to={`/profile/${candidate.id}`} className="w-full">
-          <Button
-            className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold group/btn transition-all duration-300"
-            size="lg"
-          >
-            Connect
-            <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-          </Button>
-        </Link>
+        {/* Social Links */}
+        <div className="flex items-center gap-3 justify-center pt-2">
+          {candidate.linkedin && (
+            <a
+              href={candidate.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
+            >
+              <Linkedin className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            </a>
+          )}
+          {candidate.github && (
+            <a
+              href={candidate.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
+            >
+              <Github className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            </a>
+          )}
+          {candidate.portfolio && (
+            <a
+              href={candidate.portfolio}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
+            >
+              <Globe className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            </a>
+          )}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 w-full pt-2">
+          <ContactForm
+            candidateEmail={candidate.email}
+            candidateName={candidate.name}
+            trigger={
+              <Button
+                className="flex-1 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
+                size="lg"
+              >
+                Connect
+              </Button>
+            }
+          />
+          <Link to={`/profile/${candidate.id}`} className="flex-1">
+            <Button
+              variant="outline"
+              className="w-full font-semibold group/btn transition-all duration-300"
+              size="lg"
+            >
+              View Profile
+              <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

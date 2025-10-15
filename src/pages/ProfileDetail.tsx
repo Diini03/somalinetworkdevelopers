@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate } from "@/types/candidate";
+import { ContactForm } from "@/components/ContactForm";
 import {
   MapPin,
   Banknote,
@@ -105,7 +106,7 @@ const ProfileDetail = () => {
           {/* Sidebar */}
           <div className="lg:col-span-1 space-y-6">
             {/* Profile Card */}
-            <div className="glass rounded-2xl p-8 border border-border/50 shadow-card text-center space-y-6 animate-scale-in">
+            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card text-center space-y-6 animate-scale-in">
               <div className="relative inline-block">
                 <img
                   src={candidate.photo}
@@ -120,16 +121,10 @@ const ProfileDetail = () => {
                 <p className="text-muted-foreground">{candidate.title}</p>
               </div>
 
-              <Button
-                size="lg"
-                className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105"
-                asChild
-              >
-                <a href={`mailto:${candidate.email}`}>
-                  <Mail className="w-5 h-5 mr-2" />
-                  Contact Me
-                </a>
-              </Button>
+              <ContactForm
+                candidateEmail={candidate.email}
+                candidateName={candidate.name}
+              />
 
               <div className="space-y-3 pt-4 border-t border-border/50">
                 {candidate.linkedin && (
@@ -225,7 +220,7 @@ const ProfileDetail = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* About */}
-            <div className="glass rounded-2xl p-8 border border-border/50 shadow-card space-y-4 animate-fade-in">
+            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4 animate-fade-in">
               <h2 className="text-2xl font-bold">About</h2>
               <p className="text-muted-foreground leading-relaxed text-lg">
                 {candidate.bio}
@@ -233,7 +228,7 @@ const ProfileDetail = () => {
             </div>
 
             {/* Experience */}
-            <div className="glass rounded-2xl p-8 border border-border/50 shadow-card space-y-4">
+            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
               <h2 className="text-2xl font-bold">Experience</h2>
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -247,7 +242,7 @@ const ProfileDetail = () => {
             </div>
 
             {/* Skills */}
-            <div className="glass rounded-2xl p-8 border border-border/50 shadow-card space-y-4">
+            <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
               <h2 className="text-2xl font-bold">Technical Skills</h2>
               <div className="flex flex-wrap gap-3">
                 {candidate.skills.map((skill) => (
@@ -263,7 +258,7 @@ const ProfileDetail = () => {
             </div>
 
             {/* CTA */}
-            <div className="glass rounded-2xl p-8 border border-primary/30 shadow-card bg-gradient-to-br from-primary/5 to-transparent">
+            <div className="glass rounded-2xl p-6 border border-primary/30 shadow-card bg-gradient-to-br from-primary/5 to-transparent">
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
                   <h3 className="text-xl font-bold mb-2">Interested in {candidate.name}?</h3>
@@ -271,16 +266,19 @@ const ProfileDetail = () => {
                     Get in touch to discuss opportunities and availability.
                   </p>
                 </div>
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105 whitespace-nowrap"
-                  asChild
-                >
-                  <a href={`mailto:${candidate.email}`}>
-                    <Mail className="w-5 h-5 mr-2" />
-                    Send Email
-                  </a>
-                </Button>
+                <ContactForm
+                  candidateEmail={candidate.email}
+                  candidateName={candidate.name}
+                  trigger={
+                    <Button
+                      size="lg"
+                      className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105 whitespace-nowrap"
+                    >
+                      <Mail className="w-5 h-5 mr-2" />
+                      Contact Now
+                    </Button>
+                  }
+                />
               </div>
             </div>
           </div>
