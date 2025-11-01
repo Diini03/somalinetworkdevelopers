@@ -32,7 +32,7 @@ export const CandidateGrid = ({ candidates, variant = "default" }: CandidateGrid
         </p>
       </div>
 
-      <div className={`grid gap-6 ${variant === "large" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"}`}>
+      <div className={`grid gap-6 ${variant === "large" ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" : "grid-cols-1 md:grid-cols-2 gap-6"}`}>
         {candidates.map((candidate, index) => (
           <div
             key={candidate.id}
