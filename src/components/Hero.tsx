@@ -11,21 +11,21 @@ export const Hero = ({ onSearch }: HeroProps) => {
   return (
     <section className="relative pt-32 pb-20 px-4 overflow-hidden">
       {/* Animated 3D Background */}
-      <div className="absolute inset-0 z-0 opacity-10">
+      <div className="absolute inset-0 z-0 opacity-40">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.3 }} />
-              <stop offset="100%" style={{ stopColor: 'hsl(var(--primary-glow))', stopOpacity: 0.1 }} />
+              <stop offset="0%" style={{ stopColor: 'hsl(var(--primary))', stopOpacity: 0.6 }} />
+              <stop offset="100%" style={{ stopColor: 'hsl(var(--primary-glow))', stopOpacity: 0.4 }} />
             </linearGradient>
           </defs>
           <g className="animate-[spin_20s_linear_infinite] origin-center" style={{ transformOrigin: '50% 50%' }}>
-            <circle cx="20%" cy="30%" r="100" fill="url(#grad1)" opacity="0.3" />
-            <circle cx="80%" cy="70%" r="150" fill="url(#grad1)" opacity="0.2" />
+            <circle cx="20%" cy="30%" r="100" fill="url(#grad1)" opacity="0.7" />
+            <circle cx="80%" cy="70%" r="150" fill="url(#grad1)" opacity="0.6" />
           </g>
           <g className="animate-[spin_15s_linear_infinite_reverse] origin-center" style={{ transformOrigin: '50% 50%' }}>
-            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.15" transform="translate(200, 100)" />
-            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.15" transform="translate(600, 400) scale(1.5)" />
+            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.5" transform="translate(200, 100)" />
+            <polygon points="50,10 90,90 10,90" fill="url(#grad1)" opacity="0.5" transform="translate(600, 400) scale(1.5)" />
           </g>
         </svg>
       </div>
@@ -41,9 +41,9 @@ export const Hero = ({ onSearch }: HeroProps) => {
       </div>
 
       {/* Floating Elements */}
-      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-      <div className="absolute top-40 right-20 w-32 h-32 bg-primary-glow/20 rounded-full blur-3xl animate-pulse delay-1000" />
-      <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-primary/10 rounded-full blur-3xl animate-pulse delay-500" />
+      <div className="absolute top-20 left-10 w-20 h-20 bg-primary/30 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute top-40 right-20 w-32 h-32 bg-primary-glow/35 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-primary/25 rounded-full blur-3xl animate-pulse delay-500" />
 
       {/* Content */}
       <div className="relative z-10 container mx-auto max-w-4xl text-center space-y-8 animate-fade-in-up">
