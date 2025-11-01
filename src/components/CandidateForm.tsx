@@ -50,7 +50,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
           .from("candidates")
           .select("*")
           .eq("id", candidate.id)
-          .single();
+          .maybeSingle();
         
         if (data) {
           setFormData({

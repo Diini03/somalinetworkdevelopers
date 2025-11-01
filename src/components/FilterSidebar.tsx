@@ -15,7 +15,7 @@ interface FilterSidebarProps {
   filters: {
     name: string;
     skills: string[];
-    qualification: string;
+    qualifications: string[];
     salaryMin: number;
     salaryMax: number;
     location: string;
@@ -23,6 +23,7 @@ interface FilterSidebarProps {
   onFilterChange: (filters: any) => void;
   onClearFilters: () => void;
   availableSkills: string[];
+  availableQualifications: string[];
 }
 
 export const FilterSidebar = ({
@@ -30,6 +31,7 @@ export const FilterSidebar = ({
   onFilterChange,
   onClearFilters,
   availableSkills,
+  availableQualifications,
 }: FilterSidebarProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -44,10 +46,17 @@ export const FilterSidebar = ({
     updateFilter("skills", newSkills);
   };
 
+  const toggleQualification = (qualification: string) => {
+    const newQualifications = filters.qualifications.includes(qualification)
+      ? filters.qualifications.filter((q) => q !== qualification)
+      : [...filters.qualifications, qualification];
+    updateFilter("qualifications", newQualifications);
+  };
+
   const hasActiveFilters =
     filters.name ||
     filters.skills.length > 0 ||
-    filters.qualification ||
+    filters.qualifications.length > 0 ||
     filters.location ||
     filters.salaryMin > 0 ||
     filters.salaryMax < 200000;
@@ -130,19 +139,35 @@ export const FilterSidebar = ({
         />
       </div>
 
-      {/* Qualification Filter */}
-      <div className="space-y-2">
-        <Label htmlFor="qualification" className="text-sm font-semibold">
-          Qualification
-        </Label>
-        <Input
-          id="qualification"
-          placeholder="e.g. BSc, MSc, Bootcamp"
-          value={filters.qualification}
-          onChange={(e) => updateFilter("qualification", e.target.value)}
-          className="glass border-border/50"
-        />
-      </div>
+      {/* Qualifications Filter - Collapsible */}
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="qualifications" className="border-border/50">
+          <AccordionTrigger className="text-sm font-semibold hover:no-underline py-2">
+            Qualifications
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {availableQualifications.map((qualification) => (
+                <Badge
+                  key={qualification}
+                  variant={filters.qualifications.includes(qualification) ? "default" : "outline"}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    filters.qualifications.includes(qualification)
+                      ? "bg-primary text-primary-foreground glow-accent-sm hover:opacity-90"
+                      : "hover:bg-secondary border-border/50"
+                  }`}
+                  onClick={() => toggleQualification(qualification)}
+                >
+                  {qualification}
+                  {filters.qualifications.includes(qualification) && (
+                    <X className="w-3 h-3 ml-1" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       {/* Salary Range */}
       <div className="space-y-3">
@@ -182,6 +207,19 @@ export const FilterSidebar = ({
           </div>
         </div>
       </div>
+
+      {/* Clear Filters Button at Bottom */}
+      {hasActiveFilters && (
+        <div className="pt-4 border-t border-border/50">
+          <Button
+            variant="outline"
+            onClick={onClearFilters}
+            className="w-full"
+          >
+            Clear All Filters
+          </Button>
+        </div>
+      )}
     </div>
   );
 

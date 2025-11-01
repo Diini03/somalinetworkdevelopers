@@ -12,7 +12,7 @@ const Home = () => {
   const [filters, setFilters] = useState({
     name: "",
     skills: [] as string[],
-    qualification: "",
+    qualifications: [] as string[],
     salaryMin: 0,
     salaryMax: 200000,
     location: "",
@@ -66,6 +66,17 @@ const Home = () => {
     return Array.from(skillSet).sort();
   }, [candidates]);
 
+  // Get all unique qualifications
+  const availableQualifications = useMemo(() => {
+    const qualificationSet = new Set<string>();
+    candidates.forEach((candidate) => {
+      if (candidate.qualification) {
+        qualificationSet.add(candidate.qualification);
+      }
+    });
+    return Array.from(qualificationSet).sort();
+  }, [candidates]);
+
   // Filter candidates
   const filteredCandidates = useMemo(() => {
     return candidates.filter((candidate) => {
@@ -89,14 +100,11 @@ const Home = () => {
         if (!hasAllSkills) return false;
       }
 
-      // Qualification filter
-      if (filters.qualification) {
-        if (
-          !candidate.qualification
-            .toLowerCase()
-            .includes(filters.qualification.toLowerCase())
-        )
+      // Qualifications filter
+      if (filters.qualifications.length > 0) {
+        if (!filters.qualifications.includes(candidate.qualification)) {
           return false;
+        }
       }
 
       // Location filter
@@ -125,7 +133,7 @@ const Home = () => {
     setFilters({
       name: "",
       skills: [],
-      qualification: "",
+      qualifications: [],
       salaryMin: 0,
       salaryMax: 200000,
       location: "",
@@ -146,6 +154,7 @@ const Home = () => {
             onFilterChange={setFilters}
             onClearFilters={clearFilters}
             availableSkills={availableSkills}
+            availableQualifications={availableQualifications}
           />
 
           {/* Main Content */}

@@ -14,7 +14,7 @@ interface HorizontalFiltersProps {
   filters: {
     name: string;
     skills: string[];
-    qualification: string;
+    qualifications: string[];
     salaryMin: number;
     salaryMax: number;
     location: string;
@@ -22,6 +22,7 @@ interface HorizontalFiltersProps {
   onFilterChange: (filters: any) => void;
   onClearFilters: () => void;
   availableSkills: string[];
+  availableQualifications: string[];
 }
 
 export const HorizontalFilters = ({
@@ -29,6 +30,7 @@ export const HorizontalFilters = ({
   onFilterChange,
   onClearFilters,
   availableSkills,
+  availableQualifications,
 }: HorizontalFiltersProps) => {
   const updateFilter = (key: string, value: any) => {
     onFilterChange({ ...filters, [key]: value });
@@ -41,10 +43,17 @@ export const HorizontalFilters = ({
     updateFilter("skills", newSkills);
   };
 
+  const toggleQualification = (qualification: string) => {
+    const newQualifications = filters.qualifications.includes(qualification)
+      ? filters.qualifications.filter((q) => q !== qualification)
+      : [...filters.qualifications, qualification];
+    updateFilter("qualifications", newQualifications);
+  };
+
   const hasActiveFilters =
     filters.name ||
     filters.skills.length > 0 ||
-    filters.qualification ||
+    filters.qualifications.length > 0 ||
     filters.location ||
     filters.salaryMin > 0 ||
     filters.salaryMax < 200000;
@@ -95,20 +104,6 @@ export const HorizontalFilters = ({
             placeholder="e.g. London"
             value={filters.location}
             onChange={(e) => updateFilter("location", e.target.value)}
-            className="glass border-border/50"
-          />
-        </div>
-
-        {/* Qualification Filter */}
-        <div className="space-y-2">
-          <Label htmlFor="qualification" className="text-sm font-semibold">
-            Qualification
-          </Label>
-          <Input
-            id="qualification"
-            placeholder="e.g. BSc, MSc"
-            value={filters.qualification}
-            onChange={(e) => updateFilter("qualification", e.target.value)}
             className="glass border-border/50"
           />
         </div>
@@ -168,6 +163,49 @@ export const HorizontalFilters = ({
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+
+      {/* Qualifications Filter - Full Width */}
+      <Accordion type="single" collapsible className="w-full mt-2">
+        <AccordionItem value="qualifications" className="border-border/50">
+          <AccordionTrigger className="text-sm font-semibold hover:no-underline py-2">
+            Qualifications
+          </AccordionTrigger>
+          <AccordionContent>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {availableQualifications.map((qualification) => (
+                <Badge
+                  key={qualification}
+                  variant={filters.qualifications.includes(qualification) ? "default" : "outline"}
+                  className={`cursor-pointer transition-all duration-200 ${
+                    filters.qualifications.includes(qualification)
+                      ? "bg-primary text-primary-foreground glow-accent-sm hover:opacity-90"
+                      : "hover:bg-secondary border-border/50"
+                  }`}
+                  onClick={() => toggleQualification(qualification)}
+                >
+                  {qualification}
+                  {filters.qualifications.includes(qualification) && (
+                    <X className="w-3 h-3 ml-1" />
+                  )}
+                </Badge>
+              ))}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+
+      {/* Clear Filters Button at Bottom */}
+      {hasActiveFilters && (
+        <div className="mt-6 pt-4 border-t border-border/50">
+          <Button
+            variant="outline"
+            onClick={onClearFilters}
+            className="w-full"
+          >
+            Clear All Filters
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
