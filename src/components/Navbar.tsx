@@ -1,10 +1,18 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Moon, Sun } from "lucide-react";
+import { Menu, X, User, Moon, Sun, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
   const location = useLocation();
@@ -14,6 +22,23 @@ export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userName, setUserName] = useState<string>("");
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to log out",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Logged out",
+        description: "You've been successfully logged out",
+      });
+      navigate("/");
+    }
+  };
 
   useEffect(() => {
     // Get initial session
@@ -108,12 +133,27 @@ export const Navbar = () => {
               )}
             </Button>
             {user ? (
-              <Link to="/profile">
-                <Button variant="ghost" className="font-medium">
-                  <User className="w-4 h-4 mr-2" />
-                  {userName || "Profile"}
-                </Button>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="font-medium">
+                    <User className="w-4 h-4 mr-2" />
+                    {userName || "Profile"}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <User className="w-4 h-4 mr-2" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Link to="/login">
@@ -181,12 +221,25 @@ export const Navbar = () => {
                 )}
               </Button>
               {user ? (
-                <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="ghost" className="w-full font-medium justify-start">
-                    <User className="w-4 h-4 mr-2" />
-                    {userName || "Profile"}
+                <>
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="ghost" className="w-full font-medium justify-start">
+                      <User className="w-4 h-4 mr-2" />
+                      {userName || "Profile"}
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    className="w-full font-medium justify-start text-destructive"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
                   </Button>
-                </Link>
+                </>
               ) : (
                 <>
                   <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
