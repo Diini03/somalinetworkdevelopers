@@ -234,13 +234,90 @@ const ProfileDetail = () => {
                   <p className="text-sm text-muted-foreground">
                     View the resume of {candidate.name.split(' ')[0]}
                   </p>
-                  <Button
-                    onClick={() => window.open(candidate.cv, '_blank', 'noopener,noreferrer')}
-                    className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    View CV
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = candidate.cv!;
+                        link.target = '_blank';
+                        link.rel = 'noopener noreferrer';
+                        link.download = `${candidate.name.replace(/\s+/g, '_')}_CV.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                      }}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      Download CV
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        const iframe = document.createElement('iframe');
+                        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(candidate.cv!)}&embedded=true`;
+                        iframe.style.width = '100%';
+                        iframe.style.height = '600px';
+                        iframe.style.border = 'none';
+                        
+                        const modal = document.createElement('div');
+                        modal.style.cssText = `
+                          position: fixed;
+                          top: 0;
+                          left: 0;
+                          width: 100%;
+                          height: 100%;
+                          background: rgba(0,0,0,0.8);
+                          z-index: 9999;
+                          display: flex;
+                          align-items: center;
+                          justify-content: center;
+                          padding: 20px;
+                        `;
+                        
+                        const container = document.createElement('div');
+                        container.style.cssText = `
+                          background: white;
+                          border-radius: 8px;
+                          width: 90%;
+                          height: 90%;
+                          position: relative;
+                          overflow: hidden;
+                        `;
+                        
+                        const closeBtn = document.createElement('button');
+                        closeBtn.innerHTML = '✕';
+                        closeBtn.style.cssText = `
+                          position: absolute;
+                          top: 10px;
+                          right: 10px;
+                          z-index: 10000;
+                          background: #dc2626;
+                          color: white;
+                          border: none;
+                          border-radius: 50%;
+                          width: 30px;
+                          height: 30px;
+                          font-size: 16px;
+                          cursor: pointer;
+                        `;
+                        
+                        closeBtn.onclick = () => document.body.removeChild(modal);
+                        modal.onclick = (e) => {
+                          if (e.target === modal) document.body.removeChild(modal);
+                        };
+                        
+                        container.appendChild(closeBtn);
+                        container.appendChild(iframe);
+                        modal.appendChild(container);
+                        document.body.appendChild(modal);
+                      }}
+                      className="flex-1 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
+                    >
+                      <FileText className="w-4 h-4 mr-2" />
+                      View CV
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}
