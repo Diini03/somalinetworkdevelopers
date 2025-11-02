@@ -173,18 +173,6 @@ const ProfileDetail = () => {
                      <ExternalLink className="w-4 h-4 ml-auto" />
                   </a>
                 )}
-                {candidate.cv && (
-                  <a
-                    href={candidate.cv}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors"
-                  >
-                    <FileText className="w-5 h-5" />
-                    <span className="text-sm">View CV</span>
-                    <ExternalLink className="w-4 h-4 ml-auto" />
-                  </a>
-                )}
               </div>
             </div>
 
@@ -237,6 +225,25 @@ const ProfileDetail = () => {
                 </div>
               </div>
             </div>
+
+            {/* Resume/CV Section */}
+            {candidate.cv && (
+              <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
+                <h3 className="font-bold text-lg">Resume</h3>
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    View the resume of {candidate.name.split(' ')[0]}
+                  </p>
+                  <Button
+                    onClick={() => window.open(candidate.cv, '_blank', 'noopener,noreferrer')}
+                    className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    View CV
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Main Content */}
