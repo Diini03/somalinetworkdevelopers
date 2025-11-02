@@ -25,4 +25,5 @@ export interface Candidate {
   experience: ExperienceEntry[];
   availability: string;
   certifications?: string[];
+  cv?: string;
 }

@@ -20,6 +20,7 @@ export type Database = {
           bio: string
           certifications: string[] | null
           created_at: string | null
+          cv: string | null
           email: string
           expected_salary_max: number
           expected_salary_min: number
@@ -41,6 +42,7 @@ export type Database = {
           bio: string
           certifications?: string[] | null
           created_at?: string | null
+          cv?: string | null
           email: string
           expected_salary_max: number
           expected_salary_min: number
@@ -62,6 +64,7 @@ export type Database = {
           bio?: string
           certifications?: string[] | null
           created_at?: string | null
+          cv?: string | null
           email?: string
           expected_salary_max?: number
           expected_salary_min?: number

@@ -16,6 +16,7 @@ import {
   Linkedin,
   Github,
   Globe,
+  FileText,
 } from "lucide-react";
 
 const ProfileDetail = () => {
@@ -55,6 +56,7 @@ const ProfileDetail = () => {
           experience: Array.isArray(data.experience) ? (data.experience as unknown as ExperienceEntry[]) : [],
           availability: data.availability,
           certifications: data.certifications || [],
+          cv: data.cv,
         };
         setCandidate(transformedData);
       }
@@ -168,6 +170,18 @@ const ProfileDetail = () => {
                   >
                     <Globe className="w-5 h-5" />
                     <span className="text-sm">Portfolio Website</span>
+                     <ExternalLink className="w-4 h-4 ml-auto" />
+                  </a>
+                )}
+                {candidate.cv && (
+                  <a
+                    href={candidate.cv}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <FileText className="w-5 h-5" />
+                    <span className="text-sm">View CV</span>
                     <ExternalLink className="w-4 h-4 ml-auto" />
                   </a>
                 )}

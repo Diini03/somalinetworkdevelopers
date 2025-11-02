@@ -40,7 +40,7 @@ export const CandidatesManagement = () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("candidates")
-      .select("id, name, title, email, location, availability")
+      .select("id, name, title, email, location, availability, cv")
       .order("created_at", { ascending: false });
 
     if (error) {

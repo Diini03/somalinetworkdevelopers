@@ -19,6 +19,8 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
   const [loading, setLoading] = useState(false);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string>("");
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvPreview, setCvPreview] = useState<string>("");
   const [certificationFiles, setCertificationFiles] = useState<File[]>([]);
   const [certificationPreviews, setCertificationPreviews] = useState<string[]>([]);
   const [existingCertifications, setExistingCertifications] = useState<string[]>([]);
@@ -40,6 +42,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
     github: "",
     portfolio: "",
     availability: "",
+    cv: "",
   });
 
   useEffect(() => {
@@ -68,8 +71,10 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
             github: data.github || "",
             portfolio: data.portfolio || "",
             availability: data.availability,
+            cv: data.cv || "",
           });
           setPhotoPreview(data.photo);
+          setCvPreview(data.cv || "");
           
           // Parse experience data
           if (Array.isArray(data.experience) && data.experience.length > 0) {
@@ -95,6 +100,14 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         setPhotoPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setCvFile(file);
+      setCvPreview(file.name);
     }
   };
 
@@ -164,6 +177,27 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         photoUrl = publicUrl;
       }
 
+      // Upload CV if a new file is selected
+      let cvUrl = formData.cv;
+      if (cvFile) {
+        const fileExt = cvFile.name.split('.').pop();
+        const fileName = `cv-${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('candidate-cvs')
+          .upload(fileName, cvFile);
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('candidate-cvs')
+          .getPublicUrl(fileName);
+
+        cvUrl = publicUrl;
+      }
+
       // Upload certification files
       const certificationUrls = [...existingCertifications];
       for (const file of certificationFiles) {
@@ -202,6 +236,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         experience: experiences,
         availability: formData.availability,
         certifications: certificationUrls,
+        cv: cvUrl || null,
       };
 
       let error;
@@ -311,6 +346,24 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
       <div className="space-y-2">
         <Label htmlFor="availability">Availability *</Label>
         <Input id="availability" value={formData.availability} onChange={handleChange} required />
+      </div>
+
+      {/* CV Upload */}
+      <div className="space-y-2">
+        <Label htmlFor="cv">CV / Resume</Label>
+        <Input 
+          id="cv" 
+          type="file" 
+          accept=".pdf,.doc,.docx"
+          onChange={handleCvChange}
+        />
+        <p className="text-sm text-muted-foreground">Upload CV in PDF or DOC format</p>
+        {cvPreview && (
+          <div className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+            <span>📄</span>
+            <span>{cvPreview}</span>
+          </div>
+        )}
       </div>
 
       {/* Experience Section */}
