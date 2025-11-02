@@ -2,8 +2,35 @@ import { Navbar } from "@/components/Navbar";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Target, Users, Zap, Award, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const About = () => {
+  const [candidatesCount, setCandidatesCount] = useState(0);
+  const [skillsCount, setSkillsCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data, error } = await supabase
+        .from("candidates")
+        .select("skills");
+
+      if (!error && data) {
+        setCandidatesCount(data.length);
+        
+        // Count unique skills
+        const allSkills = new Set<string>();
+        data.forEach((candidate) => {
+          if (Array.isArray(candidate.skills)) {
+            candidate.skills.forEach((skill: string) => allSkills.add(skill));
+          }
+        });
+        setSkillsCount(allSkills.size);
+      }
+    };
+
+    fetchStats();
+  }, []);
   const features = [
     {
       icon: Target,
@@ -90,13 +117,13 @@ const About = () => {
             <div className="grid grid-cols-3 gap-8 text-center">
               <div className="space-y-2">
                 <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                  12+
+                  {candidatesCount}+
                 </div>
-                <div className="text-muted-foreground">Active Developers</div>
+                <div className="text-muted-foreground">Active Candidates</div>
               </div>
               <div className="space-y-2">
                 <div className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
-                  50+
+                  {skillsCount}+
                 </div>
                 <div className="text-muted-foreground">Skills Covered</div>
               </div>

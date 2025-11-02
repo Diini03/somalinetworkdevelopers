@@ -5,9 +5,11 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 interface HeroProps {
   onSearch?: (query: string) => void;
+  candidatesCount?: number;
+  skillsCount?: number;
 }
 
-export const Hero = ({ onSearch }: HeroProps) => {
+export const Hero = ({ onSearch, candidatesCount = 0, skillsCount = 0 }: HeroProps) => {
   return (
     <section className="relative pt-32 pb-20 px-4 overflow-hidden">
       {/* Animated 3D Background */}
@@ -91,12 +93,12 @@ export const Hero = ({ onSearch }: HeroProps) => {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-8">
           <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-bold text-primary">12+</div>
-            <div className="text-sm text-muted-foreground">Developers</div>
+            <div className="text-3xl sm:text-4xl font-bold text-primary">{candidatesCount}+</div>
+            <div className="text-sm text-muted-foreground">Candidates</div>
           </div>
           <div className="space-y-1">
-            <div className="text-3xl sm:text-4xl font-bold text-primary">8+</div>
-            <div className="text-sm text-muted-foreground">Tech Stacks</div>
+            <div className="text-3xl sm:text-4xl font-bold text-primary">{skillsCount}+</div>
+            <div className="text-sm text-muted-foreground">Skills</div>
           </div>
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-bold text-primary">100%</div>

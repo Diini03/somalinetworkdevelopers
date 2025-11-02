@@ -144,7 +144,11 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <Hero onSearch={setSearchQuery} />
+      <Hero 
+        onSearch={setSearchQuery} 
+        candidatesCount={candidates.length}
+        skillsCount={availableSkills.length}
+      />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pb-20">
         <div className="flex gap-8">
