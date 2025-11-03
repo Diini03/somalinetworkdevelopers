@@ -57,7 +57,7 @@ const Contact = () => {
 
       {/* Contact Form & Info */}
       <section className="pb-32 px-4">
-        <div className="container mx-auto max-w-5xl">
+        <div className="container mx-auto max-w-4xl">
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Contact Info */}
             <div className="lg:col-span-2 space-y-6">

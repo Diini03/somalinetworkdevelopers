@@ -146,7 +146,7 @@ const Candidates = () => {
       
       {/* Page Header */}
       <div className="pt-24 pb-8 px-4 border-b border-border/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto max-w-4xl">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
               All Candidates
@@ -158,7 +158,7 @@ const Candidates = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="container mx-auto max-w-4xl px-4 py-12">
         {/* Horizontal Filters */}
         <HorizontalFilters
           filters={filters}

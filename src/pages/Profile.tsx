@@ -73,7 +73,7 @@ const Profile = () => {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <div className="container mx-auto px-4 pt-32 pb-20">
+        <div className="container mx-auto max-w-4xl px-4 pt-32 pb-20">
           <div className="flex items-center justify-center">
             <p className="text-muted-foreground">Loading profile...</p>
           </div>
@@ -85,71 +85,69 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 pt-32 pb-20">
-        <div className="max-w-2xl mx-auto">
-          <Card className="glass border-border/50 p-8">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4 glow-accent-sm">
-                <User className="w-10 h-10 text-primary" />
+      <div className="container mx-auto max-w-4xl px-4 pt-32 pb-20">
+        <Card className="glass border-border/50 p-8">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4 glow-accent-sm">
+              <User className="w-10 h-10 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold mb-2">Your Profile</h1>
+            <p className="text-muted-foreground">
+              Manage your account information
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {/* Name */}
+            {profile?.name && (
+              <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
+                <User className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Full Name</p>
+                  <p className="font-medium">{profile.name}</p>
+                </div>
               </div>
-              <h1 className="text-3xl font-bold mb-2">Your Profile</h1>
-              <p className="text-muted-foreground">
-                Manage your account information
-              </p>
-            </div>
+            )}
 
-            <div className="space-y-6">
-              {/* Name */}
-              {profile?.name && (
-                <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
-                  <User className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Full Name</p>
-                    <p className="font-medium">{profile.name}</p>
-                  </div>
+            {/* Email */}
+            {user?.email && (
+              <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
+                <Mail className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Email Address</p>
+                  <p className="font-medium">{user.email}</p>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Email */}
-              {user?.email && (
-                <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
-                  <Mail className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Email Address</p>
-                    <p className="font-medium">{user.email}</p>
-                  </div>
+            {/* Member Since */}
+            {user?.created_at && (
+              <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
+                <Calendar className="w-5 h-5 text-primary" />
+                <div>
+                  <p className="text-sm text-muted-foreground">Member Since</p>
+                  <p className="font-medium">
+                    {new Date(user.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
                 </div>
-              )}
+              </div>
+            )}
 
-              {/* Member Since */}
-              {user?.created_at && (
-                <div className="flex items-center gap-4 p-4 rounded-lg glass border border-border/50">
-                  <Calendar className="w-5 h-5 text-primary" />
-                  <div>
-                    <p className="text-sm text-muted-foreground">Member Since</p>
-                    <p className="font-medium">
-                      {new Date(user.created_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Logout Button */}
-              <Button
-                onClick={handleLogout}
-                variant="outline"
-                className="w-full mt-8"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Log Out
-              </Button>
-            </div>
-          </Card>
-        </div>
+            {/* Logout Button */}
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full mt-8"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Log Out
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   );
