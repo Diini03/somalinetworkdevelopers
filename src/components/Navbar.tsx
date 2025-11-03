@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
+import sndLogo from "@/assets/snd-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -92,13 +93,22 @@ export const Navbar = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary-glow flex items-center justify-center glow-accent-sm transition-all duration-300 group-hover:scale-110">
-              <span className="text-primary-foreground font-bold text-lg">D</span>
+          <Link to="/" className="flex items-center space-x-3 group">
+            <img 
+              src={sndLogo} 
+              alt="SND Logo" 
+              className="w-10 h-10 transition-all duration-300 group-hover:scale-110"
+            />
+            <div className="hidden lg:block">
+              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                Somali Network Developers
+              </span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent hidden sm:block">
-              DevDirectory
-            </span>
+            <div className="hidden sm:block lg:hidden">
+              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                SND
+              </span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}

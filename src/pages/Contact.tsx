@@ -40,17 +40,17 @@ const Contact = () => {
 
           <h1 className="text-5xl sm:text-6xl font-bold leading-tight">
             <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Let's Start a
+              Connect with
             </span>
             <br />
             <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-              Conversation
+              SND Community
             </span>
           </h1>
 
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Have questions or want to learn more? We'd love to hear from you. Send
-            us a message and we'll respond as soon as possible.
+            Have a question or idea? Reach out and become part of the Somali Network 
+            Developers community.
           </p>
         </div>
       </section>
@@ -72,10 +72,10 @@ const Contact = () => {
                       We're here to help with any questions
                     </p>
                     <a
-                      href="mailto:hello@devdirectory.com"
+                      href="mailto:info@somalinetdev.com"
                       className="text-primary hover:text-primary-glow transition-colors inline-block mt-2"
                     >
-                      hello@devdirectory.com
+                      info@somalinetdev.com
                     </a>
                   </div>
                 </div>

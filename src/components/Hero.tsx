@@ -50,22 +50,22 @@ export const Hero = ({ onSearch, candidatesCount = 0, skillsCount = 0 }: HeroPro
       {/* Content */}
       <div className="relative z-10 container mx-auto max-w-4xl text-center space-y-8 animate-fade-in-up">
         <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary font-medium text-sm mb-4 glow-accent-sm">
-          🚀 Discover Top Developer Talent
+          🌍 Somali Network Developers
         </div>
 
         <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight">
           <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
-            Find & Hire
+            Empowering
           </span>
           <br />
           <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-            Elite Developers
+            Somali Developers Worldwide
           </span>
         </h1>
 
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-          Connect with talented junior and mid-level developers ready to bring
-          your ideas to life. Filter by skills, location, and experience.
+          Join the growing network of Somali coders, designers, and tech innovators.
+          Collaborate. Learn. Build the future.
         </p>
 
         {/* Search Bar */}
@@ -94,7 +94,7 @@ export const Hero = ({ onSearch, candidatesCount = 0, skillsCount = 0 }: HeroPro
         <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto pt-8">
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-bold text-primary">{candidatesCount}+</div>
-            <div className="text-sm text-muted-foreground">Candidates</div>
+            <div className="text-sm text-muted-foreground">Developers</div>
           </div>
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-bold text-primary">{skillsCount}+</div>
@@ -102,7 +102,7 @@ export const Hero = ({ onSearch, candidatesCount = 0, skillsCount = 0 }: HeroPro
           </div>
           <div className="space-y-1">
             <div className="text-3xl sm:text-4xl font-bold text-primary">100%</div>
-            <div className="text-sm text-muted-foreground">Quality</div>
+            <div className="text-sm text-muted-foreground">Community</div>
           </div>
         </div>
       </div>
