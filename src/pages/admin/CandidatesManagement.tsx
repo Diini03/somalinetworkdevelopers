@@ -27,6 +27,8 @@ interface Candidate {
   email: string;
   location: string;
   availability: string;
+  ai_score?: number;
+  ai_score_updated_at?: string;
 }
 
 export const CandidatesManagement = () => {
@@ -34,13 +36,15 @@ export const CandidatesManagement = () => {
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Candidate | null>(null);
+  const [isScoringAll, setIsScoringAll] = useState(false);
   const { toast } = useToast();
 
   const fetchCandidates = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from("candidates")
-      .select("id, name, title, email, location, availability, cv")
+      .select("id, name, title, email, location, availability, cv, ai_score, ai_score_updated_at")
+      .order("ai_score", { ascending: false, nullsFirst: false })
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -95,6 +99,48 @@ export const CandidatesManagement = () => {
     fetchCandidates();
   };
 
+  const handleBatchScore = async () => {
+    if (!confirm("This will calculate AI scores for all candidates. This may take a few minutes. Continue?")) {
+      return;
+    }
+
+    setIsScoringAll(true);
+    
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/batch-score-candidates`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          },
+        }
+      );
+
+      const result = await response.json();
+
+      if (response.ok) {
+        toast({
+          title: "Batch Scoring Complete",
+          description: `Successfully scored ${result.successful} candidates. Failed: ${result.failed}`,
+        });
+        fetchCandidates();
+      } else {
+        throw new Error(result.error || "Failed to score candidates");
+      }
+    } catch (error: any) {
+      console.error("Batch scoring error:", error);
+      toast({
+        title: "Batch Scoring Failed",
+        description: error.message || "An error occurred while scoring candidates",
+        variant: "destructive",
+      });
+    } finally {
+      setIsScoringAll(false);
+    }
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-8">
@@ -105,10 +151,29 @@ export const CandidatesManagement = () => {
               Manage all candidates in the system
             </p>
           </div>
-          <Button onClick={handleAdd} className="gap-2">
-            <Plus size={20} />
-            Add Candidate
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              onClick={handleBatchScore} 
+              variant="outline"
+              disabled={isScoringAll || loading}
+              className="gap-2"
+            >
+              {isScoringAll ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  Scoring...
+                </>
+              ) : (
+                <>
+                  ⭐ Calculate AI Scores
+                </>
+              )}
+            </Button>
+            <Button onClick={handleAdd} className="gap-2">
+              <Plus size={20} />
+              Add Candidate
+            </Button>
+          </div>
         </div>
 
         {loading ? (
@@ -125,6 +190,7 @@ export const CandidatesManagement = () => {
                   <TableHead>Email</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead>Availability</TableHead>
+                  <TableHead>AI Score</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -136,6 +202,16 @@ export const CandidatesManagement = () => {
                     <TableCell>{candidate.email}</TableCell>
                     <TableCell>{candidate.location}</TableCell>
                     <TableCell>{candidate.availability}</TableCell>
+                    <TableCell>
+                      {candidate.ai_score ? (
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-primary">{candidate.ai_score}</span>
+                          <span className="text-xs text-muted-foreground">/ 100</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">Not scored</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button
                         variant="ghost"

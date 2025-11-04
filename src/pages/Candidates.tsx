@@ -24,6 +24,7 @@ const Candidates = () => {
       const { data, error } = await supabase
         .from("candidates")
         .select("*")
+        .order("ai_score", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       if (!error && data) {
@@ -47,6 +48,7 @@ const Candidates = () => {
           experience: Array.isArray(c.experience) ? (c.experience as any[]) : [],
           availability: c.availability,
           certifications: c.certifications || [],
+          cv: c.cv,
         }));
         setCandidates(transformedData);
       }

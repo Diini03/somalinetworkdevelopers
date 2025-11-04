@@ -1,1 +1,10 @@
 project_id = "nuicglnuihcnxhinpgxl"
+
+[functions.send-candidate-contact-email]
+verify_jwt = false
+
+[functions.calculate-candidate-score]
+verify_jwt = false
+
+[functions.batch-score-candidates]
+verify_jwt = true

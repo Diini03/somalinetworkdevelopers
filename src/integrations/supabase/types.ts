@@ -16,6 +16,8 @@ export type Database = {
     Tables: {
       candidates: {
         Row: {
+          ai_score: number | null
+          ai_score_updated_at: string | null
           availability: string
           bio: string
           certifications: string[] | null
@@ -32,12 +34,15 @@ export type Database = {
           name: string
           photo: string
           portfolio: string | null
+          profile_completeness: number | null
           qualification: string
           skills: string[]
           title: string
           updated_at: string | null
         }
         Insert: {
+          ai_score?: number | null
+          ai_score_updated_at?: string | null
           availability: string
           bio: string
           certifications?: string[] | null
@@ -54,12 +59,15 @@ export type Database = {
           name: string
           photo: string
           portfolio?: string | null
+          profile_completeness?: number | null
           qualification: string
           skills: string[]
           title: string
           updated_at?: string | null
         }
         Update: {
+          ai_score?: number | null
+          ai_score_updated_at?: string | null
           availability?: string
           bio?: string
           certifications?: string[] | null
@@ -76,12 +84,57 @@ export type Database = {
           name?: string
           photo?: string
           portfolio?: string | null
+          profile_completeness?: number | null
           qualification?: string
           skills?: string[]
           title?: string
           updated_at?: string | null
         }
         Relationships: []
+      }
+      contact_submissions: {
+        Row: {
+          candidate_id: string
+          email_sent_successfully: boolean
+          error_message: string | null
+          id: string
+          message: string
+          sender_email: string
+          sender_name: string
+          sent_at: string
+          subject: string
+        }
+        Insert: {
+          candidate_id: string
+          email_sent_successfully?: boolean
+          error_message?: string | null
+          id?: string
+          message: string
+          sender_email: string
+          sender_name: string
+          sent_at?: string
+          subject: string
+        }
+        Update: {
+          candidate_id?: string
+          email_sent_successfully?: boolean
+          error_message?: string | null
+          id?: string
+          message?: string
+          sender_email?: string
+          sender_name?: string
+          sent_at?: string
+          subject?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_submissions_candidate_id_fkey"
+            columns: ["candidate_id"]
+            isOneToOne: false
+            referencedRelation: "candidates"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {

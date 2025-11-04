@@ -25,22 +25,50 @@ export const InlineContactForm = ({ candidateEmail, candidateName }: InlineConta
     e.preventDefault();
     setLoading(true);
 
-    // Create mailto link as fallback
-    const mailtoLink = `mailto:${candidateEmail}?subject=${encodeURIComponent(
-      formData.subject
-    )}&body=${encodeURIComponent(
-      `From: ${formData.name} (${formData.email})\n\n${formData.message}`
-    )}`;
+    try {
+      // Get candidate ID from the URL
+      const candidateId = window.location.pathname.split('/').pop();
 
-    window.location.href = mailtoLink;
+      // Send email through edge function
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-candidate-contact-email`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            candidateId: candidateId,
+            candidateEmail: candidateEmail,
+            candidateName: candidateName,
+            senderName: formData.name,
+            senderEmail: formData.email,
+            subject: formData.subject,
+            message: formData.message,
+          }),
+        }
+      );
 
-    toast({
-      title: "Opening email client",
-      description: `Preparing to send message to ${candidateName}`,
-    });
+      if (!response.ok) {
+        throw new Error("Failed to send email");
+      }
 
-    setLoading(false);
-    setFormData({ name: "", email: "", subject: "", message: "" });
+      toast({
+        title: "Message sent successfully!",
+        description: `${candidateName} will receive your email shortly.`,
+      });
+
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Error sending message:", error);
+      toast({
+        title: "Failed to send message",
+        description: "Please try again later or contact support.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

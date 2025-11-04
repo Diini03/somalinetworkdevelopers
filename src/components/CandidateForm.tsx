@@ -239,6 +239,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         cv: cvUrl || null,
       };
 
+      let savedCandidateId = candidate?.id;
       let error;
       if (candidate) {
         ({ error } = await supabase
@@ -246,7 +247,16 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
           .update(candidateData)
           .eq("id", candidate.id));
       } else {
-        ({ error } = await supabase.from("candidates").insert(candidateData));
+        const { data: newCandidate, error: insertError } = await supabase
+          .from("candidates")
+          .insert(candidateData)
+          .select()
+          .single();
+        
+        error = insertError;
+        if (newCandidate) {
+          savedCandidateId = newCandidate.id;
+        }
       }
 
       if (error) {
@@ -257,6 +267,33 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         title: "Success",
         description: `Candidate ${candidate ? "updated" : "added"} successfully`,
       });
+
+      // Trigger AI scoring in the background
+      if (savedCandidateId) {
+        fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/calculate-candidate-score`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              candidateId: savedCandidateId,
+              name: formData.name,
+              title: formData.title,
+              skills: formData.skills.split(",").map(s => s.trim()),
+              experience: experiences,
+              qualification: formData.qualification,
+              bio: formData.bio,
+              expectedSalary: {
+                min: parseInt(formData.expected_salary_min),
+                max: parseInt(formData.expected_salary_max),
+              },
+            }),
+          }
+        ).catch(err => console.error("AI scoring error:", err));
+      }
+
       onSuccess();
     } catch (error: any) {
       toast({
