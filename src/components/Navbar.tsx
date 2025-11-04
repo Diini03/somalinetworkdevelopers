@@ -99,7 +99,7 @@ export const Navbar = () => {
               alt="SND Logo" 
               className="w-10 h-10 transition-all duration-300 group-hover:scale-110"
             />
-            <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <span className="text-3xl font-black tracking-tighter uppercase bg-gradient-to-r from-[#418FDE] to-[#003366] bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-tight" style={{ fontFamily: 'Futura, Gotham, Montserrat, sans-serif', fontWeight: 900 }}>
               SND
             </span>
           </Link>
