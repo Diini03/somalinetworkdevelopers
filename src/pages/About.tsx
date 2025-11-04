@@ -139,7 +139,7 @@ const About = () => {
 
       {/* Features Grid */}
       <section className="pb-20 px-4">
-        <div className="container mx-auto max-w-4xl">
+        <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <div

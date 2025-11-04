@@ -70,7 +70,7 @@ const ProfileDetail = () => {
     return (
       <div className="min-h-screen">
         <Navbar />
-        <div className="container mx-auto max-w-4xl px-4 pt-32 flex justify-center">
+        <div className="container mx-auto px-4 pt-32 flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
@@ -81,7 +81,7 @@ const ProfileDetail = () => {
     return (
       <div className="min-h-screen">
         <Navbar />
-        <div className="container mx-auto max-w-4xl px-4 pt-32 text-center">
+        <div className="container mx-auto px-4 pt-32 text-center">
           <h1 className="text-3xl font-bold mb-4">Candidate Not Found</h1>
           <Button onClick={() => navigate(-1)}>Go Back</Button>
         </div>
@@ -93,7 +93,7 @@ const ProfileDetail = () => {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="container mx-auto max-w-4xl px-4 pt-24 pb-20">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20">
         {/* Back Button */}
         <Button
           variant="ghost"
