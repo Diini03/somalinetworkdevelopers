@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
-import sndLogo from "@/assets/snd-logo.png";
+import sndLogo from "@/assets/snd-icon.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -99,16 +99,9 @@ export const Navbar = () => {
               alt="SND Logo" 
               className="w-10 h-10 transition-all duration-300 group-hover:scale-110"
             />
-            <div className="hidden lg:block">
-              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                Somali Network Developers
-              </span>
-            </div>
-            <div className="hidden sm:block lg:hidden">
-              <span className="text-xl font-bold bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                SND
-              </span>
-            </div>
+            <span className="text-2xl font-black tracking-tight bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+              SND
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
