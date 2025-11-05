@@ -153,6 +153,20 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
     e.preventDefault();
     setLoading(true);
 
+    // Basic email validation before any uploads
+    const email = formData.email.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+    if (!emailRegex.test(email) || email.length > 255) {
+      setLoading(false);
+      toast({
+        title: "Invalid email",
+        description: "Please enter a valid candidate email address (max 255 chars).",
+        variant: "destructive",
+      });
+      return;
+    }
+    const candidateEmail = email;
+
     try {
       let photoUrl = formData.photo;
 
@@ -229,7 +243,7 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         location: formData.location,
         qualification: formData.qualification,
         bio: formData.bio,
-        email: formData.email,
+        email: candidateEmail,
         linkedin: formData.linkedin || null,
         github: formData.github || null,
         portfolio: formData.portfolio || null,

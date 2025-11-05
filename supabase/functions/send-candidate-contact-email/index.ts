@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "https://esm.sh/resend@4.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.75.0";
+import { z } from "https://esm.sh/zod@3.25.8";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -19,21 +20,42 @@ interface ContactEmailRequest {
   message: string;
 }
 
+const contactSchema = z.object({
+  candidateId: z.string().uuid(),
+  candidateEmail: z.string().trim().email().max(255),
+  candidateName: z.string().trim().min(1).max(100),
+  senderName: z.string().trim().min(1).max(100),
+  senderEmail: z.string().trim().email().max(255),
+  subject: z.string().trim().min(1).max(150),
+  message: z.string().trim().min(1).max(1000),
+});
+
+const escapeHtml = (s: string) =>
+  s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const {
-      candidateId,
-      candidateEmail,
-      candidateName,
-      senderName,
-      senderEmail,
-      subject,
-      message,
-    }: ContactEmailRequest = await req.json();
+    const body = await req.json();
+    const parsed = contactSchema.safeParse(body);
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({
+          error: "Invalid input",
+          issues: parsed.error.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const { candidateId, candidateEmail, candidateName, senderName, senderEmail, subject, message } = parsed.data;
 
     console.log("Sending contact email to:", candidateEmail);
 
@@ -42,13 +64,16 @@ const handler = async (req: Request): Promise<Response> => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Send email via Resend
-    const emailResponse = await resend.emails.send({
-      from: "SND Platform <onboarding@resend.dev>",
-      to: [candidateEmail],
-      replyTo: senderEmail,
-      subject: `New Message from SND Platform - ${subject}`,
-      html: `
+    // Prepare safe content and from address
+    const fromEnv = Deno.env.get("RESEND_FROM");
+    const fromAddress = fromEnv && fromEnv.includes("@") ? fromEnv : "SND Platform <onboarding@resend.dev>";
+
+    const safeCandidateName = escapeHtml(candidateName);
+    const safeSenderName = escapeHtml(senderName);
+    const safeSubject = escapeHtml(subject);
+    const safeMessageHtml = escapeHtml(message).replace(/\n/g, '<br>');
+
+    const html = `
         <!DOCTYPE html>
         <html>
           <head>
@@ -72,23 +97,23 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <div class="content">
-                <p>Hi <strong>${candidateName}</strong>,</p>
+                <p>Hi <strong>${safeCandidateName}</strong>,</p>
                 <p>You have received a new message through the Somali Network Developers platform.</p>
                 
                 <div class="info-box">
-                  <p><span class="label">From:</span> ${senderName}</p>
+                  <p><span class="label">From:</span> ${safeSenderName}</p>
                   <p><span class="label">Email:</span> <a href="mailto:${senderEmail}">${senderEmail}</a></p>
-                  <p><span class="label">Subject:</span> ${subject}</p>
+                  <p><span class="label">Subject:</span> ${safeSubject}</p>
                 </div>
                 
                 <div class="message-box">
                   <p class="label">Message:</p>
-                  <p>${message.replace(/\n/g, '<br>')}</p>
+                  <p>${safeMessageHtml}</p>
                 </div>
                 
                 <div style="text-align: center;">
                   <a href="mailto:${senderEmail}?subject=Re: ${encodeURIComponent(subject)}" class="button">
-                    Reply to ${senderName}
+                    Reply to ${safeSenderName}
                   </a>
                 </div>
               </div>
@@ -100,8 +125,15 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
             </div>
           </body>
-        </html>
-      `,
+        </html>`;
+
+    // Send email via Resend
+    const emailResponse = await resend.emails.send({
+      from: fromAddress,
+      to: [candidateEmail],
+      replyTo: senderEmail,
+      subject: `New Message from SND Platform - ${safeSubject}`,
+      html,
     });
 
     console.log("Resend response:", emailResponse);
