@@ -25,6 +25,7 @@ const Home = () => {
       const { data, error } = await supabase
         .from("candidates")
         .select("*")
+        .order("ai_score", { ascending: false, nullsFirst: false })
         .order("created_at", { ascending: false });
 
       if (!error && data) {

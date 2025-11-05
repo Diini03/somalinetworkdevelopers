@@ -393,6 +393,7 @@ const ProfileDetail = () => {
 
             {/* Contact Form */}
             <InlineContactForm
+              candidateId={candidate.id}
               candidateEmail={candidate.email}
               candidateName={candidate.name}
             />

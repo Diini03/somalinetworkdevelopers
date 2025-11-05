@@ -7,11 +7,12 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail } from "lucide-react";
 
 interface InlineContactFormProps {
+  candidateId: string;
   candidateEmail: string;
   candidateName: string;
 }
 
-export const InlineContactForm = ({ candidateEmail, candidateName }: InlineContactFormProps) => {
+export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }: InlineContactFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -26,9 +27,6 @@ export const InlineContactForm = ({ candidateEmail, candidateName }: InlineConta
     setLoading(true);
 
     try {
-      // Get candidate ID from the URL
-      const candidateId = window.location.pathname.split('/').pop();
-
       // Send email through edge function
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-candidate-contact-email`,
@@ -36,6 +34,7 @@ export const InlineContactForm = ({ candidateEmail, candidateName }: InlineConta
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
           },
           body: JSON.stringify({
             candidateId: candidateId,
