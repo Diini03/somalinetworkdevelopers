@@ -37,6 +37,11 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending contact email to:", candidateEmail);
 
+    // Create Supabase client for logging
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     // Send email via Resend
     const emailResponse = await resend.emails.send({
       from: "SND Platform <onboarding@resend.dev>",
@@ -99,13 +104,38 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Resend response:", emailResponse);
 
-    // Log the submission to database
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    if (emailResponse.error) {
+      // Log failed submission
+      await supabase.from("contact_submissions").insert({
+        candidate_id: candidateId,
+        sender_name: senderName,
+        sender_email: senderEmail,
+        subject: subject,
+        message: message,
+        email_sent_successfully: false,
+        error_message: emailResponse.error.message,
+      });
 
+      const isDomainError = (emailResponse.error as any).statusCode === 403;
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: emailResponse.error.message,
+          code: emailResponse.error.name,
+          hint: isDomainError
+            ? "Email sending blocked: verify your domain at resend.com/domains and use a verified 'from' address."
+            : undefined,
+        }),
+        {
+          status: isDomainError ? 403 : 502,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Log success
     await supabase.from("contact_submissions").insert({
       candidate_id: candidateId,
       sender_name: senderName,

@@ -27,6 +27,22 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
     setLoading(true);
 
     try {
+      // Basic client-side validation limits
+      if (
+        formData.name.length > 100 ||
+        formData.email.length > 255 ||
+        formData.subject.length > 150 ||
+        formData.message.length > 1000
+      ) {
+        toast({
+          title: "Validation error",
+          description: "Please keep inputs within allowed length limits.",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+
       // Send email through edge function
       const response = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-candidate-contact-email`,
@@ -34,7 +50,7 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
+            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
           },
           body: JSON.stringify({
             candidateId: candidateId,
@@ -49,7 +65,25 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to send email");
+        let serverMsg = "Failed to send email via server.";
+        try {
+          const err = await response.json();
+          serverMsg = err?.error || serverMsg;
+        } catch {}
+
+        // Fallback to user's email client to ensure message gets through
+        const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
+          formData.subject
+        )}&body=${encodeURIComponent(
+          `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
+        )}`;
+        toast({
+          title: "Email service unavailable",
+          description: `${serverMsg} We'll open your email client as a fallback.`,
+          variant: "destructive",
+        });
+        window.location.href = mailto;
+        return;
       }
 
       toast({
@@ -60,11 +94,19 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Error sending message:", error);
+      // Final fallback to mailto in case of network/runtime errors
+      const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
+        formData.subject
+      )}&body=${encodeURIComponent(
+        `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
+      )}`;
       toast({
         title: "Failed to send message",
-        description: "Please try again later or contact support.",
+        description:
+          "We couldn't reach the email service. We'll open your email client as a fallback.",
         variant: "destructive",
       });
+      window.location.href = mailto;
     } finally {
       setLoading(false);
     }
