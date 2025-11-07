@@ -27,7 +27,7 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
     setLoading(true);
 
     try {
-      // Basic client-side validation limits
+      // Basic client-side validation
       if (
         formData.name.length > 100 ||
         formData.email.length > 255 ||
@@ -43,70 +43,27 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
         return;
       }
 
-      // Send email through edge function
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-candidate-contact-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || "",
-          },
-          body: JSON.stringify({
-            candidateId: candidateId,
-            candidateEmail: candidateEmail,
-            candidateName: candidateName,
-            senderName: formData.name,
-            senderEmail: formData.email,
-            subject: formData.subject,
-            message: formData.message,
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        let serverMsg = "Failed to send email via server.";
-        try {
-          const err = await response.json();
-          serverMsg = err?.error || serverMsg;
-        } catch {}
-
-        // Fallback to user's email client to ensure message gets through
-        const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
-          formData.subject
-        )}&body=${encodeURIComponent(
-          `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
-        )}`;
-        toast({
-          title: "Email service unavailable",
-          description: `${serverMsg} We'll open your email client as a fallback.`,
-          variant: "destructive",
-        });
-        window.location.href = mailto;
-        return;
-      }
-
-      toast({
-        title: "Message sent successfully!",
-        description: `${candidateName} will receive your email shortly.`,
-      });
-
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error) {
-      console.error("Error sending message:", error);
-      // Final fallback to mailto in case of network/runtime errors
+      // Use mailto as primary method to ensure delivery
       const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
         formData.subject
       )}&body=${encodeURIComponent(
         `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
       )}`;
+      
       toast({
-        title: "Failed to send message",
-        description:
-          "We couldn't reach the email service. We'll open your email client as a fallback.",
+        title: "Opening your email client",
+        description: `Composing message to ${candidateName}...`,
+      });
+      
+      window.location.href = mailto;
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    } catch (error) {
+      console.error("Error opening email client:", error);
+      toast({
+        title: "Error",
+        description: "Could not open email client. Please try again.",
         variant: "destructive",
       });
-      window.location.href = mailto;
     } finally {
       setLoading(false);
     }
