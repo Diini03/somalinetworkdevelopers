@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail } from "lucide-react";
-
+import { supabase } from "@/integrations/supabase/client";
 interface InlineContactFormProps {
   candidateId: string;
   candidateEmail: string;
@@ -43,19 +43,40 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
         return;
       }
 
-      // Use mailto as primary method to ensure delivery
-      const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
-        formData.subject
-      )}&body=${encodeURIComponent(
-        `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
-      )}`;
-      
-      toast({
-        title: "Opening your email client",
-        description: `Composing message to ${candidateName}...`,
+      // Try backend email first via Edge Function (Resend). Fallback to mailto.
+      const { data, error } = await supabase.functions.invoke('send-candidate-contact-email', {
+        body: {
+          candidateId,
+          candidateEmail,
+          candidateName,
+          senderName: formData.name,
+          senderEmail: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
       });
-      
-      window.location.href = mailto;
+
+      if (error) {
+        const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
+          formData.subject
+        )}&body=${encodeURIComponent(
+          `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
+        )}`;
+        toast({
+          title: "Email service unavailable",
+          description: "Opening your email client as a fallback.",
+          variant: "destructive",
+        });
+        window.location.href = mailto;
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        return;
+      }
+
+      toast({
+        title: "Message sent!",
+        description: `${candidateName} will receive your email shortly.`,
+      });
+
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
       console.error("Error opening email client:", error);
