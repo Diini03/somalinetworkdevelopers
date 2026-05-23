@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate, ExperienceEntry } from "@/types/candidate";
 import { InlineContactForm } from "@/components/InlineContactForm";
+import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
-  Banknote,
   GraduationCap,
   Clock,
   ExternalLink,
@@ -22,41 +22,35 @@ import {
 const ProfileDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasCv, setHasCv] = useState(false);
+  const [cvLoading, setCvLoading] = useState(false);
 
   useEffect(() => {
     const fetchCandidate = async () => {
       if (!id) return;
 
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc("get_public_candidate", { _id: id });
+      const row = Array.isArray(data) ? data[0] : data;
 
-      if (!error && data) {
+      if (!error && row) {
         const transformedData: Candidate = {
-          id: data.id,
-          name: data.name,
-          title: data.title,
-          photo: data.photo,
-          skills: data.skills,
-          expectedSalary: {
-            min: data.expected_salary_min,
-            max: data.expected_salary_max,
-          },
-          location: data.location,
-          qualification: data.qualification,
-          bio: data.bio,
-          email: data.email,
-          linkedin: data.linkedin,
-          github: data.github,
-          portfolio: data.portfolio,
-          experience: Array.isArray(data.experience) ? (data.experience as unknown as ExperienceEntry[]) : [],
-          availability: data.availability,
-          certifications: data.certifications || [],
-          cv: data.cv,
+          id: row.id,
+          name: row.name,
+          title: row.title,
+          photo: row.photo,
+          skills: row.skills || [],
+          location: row.location,
+          qualification: row.qualification,
+          bio: row.bio,
+          linkedin: row.linkedin,
+          github: row.github,
+          portfolio: row.portfolio,
+          experience: Array.isArray(row.experience) ? (row.experience as unknown as ExperienceEntry[]) : [],
+          availability: row.availability,
+          certifications: row.certifications || [],
         };
         setCandidate(transformedData);
       }
@@ -65,6 +59,37 @@ const ProfileDetail = () => {
 
     fetchCandidate();
   }, [id]);
+
+  // Separately check (admin-only direct query allowed by RLS) whether a CV exists,
+  // without exposing its URL. We just probe the public-safe metadata via a head request
+  // — here we infer presence by trying to request a signed URL on demand.
+  useEffect(() => {
+    if (!id) return;
+    // Optimistically assume a CV may exist; the button handler will report if it doesn't.
+    setHasCv(true);
+  }, [id]);
+
+  const openCv = async () => {
+    if (!candidate) return;
+    setCvLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("get-cv-signed-url", {
+        body: { candidateId: candidate.id },
+      });
+      if (error || !data?.url) {
+        toast({
+          title: "CV unavailable",
+          description: "You need to be signed in, or this candidate has no CV uploaded.",
+          variant: "destructive",
+        });
+        setHasCv(false);
+        return;
+      }
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } finally {
+      setCvLoading(false);
+    }
+  };
 
   if (loading) {
     return (
