@@ -11,9 +11,7 @@ const About = () => {
 
   useEffect(() => {
     const fetchStats = async () => {
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("skills");
+      const { data, error } = await supabase.rpc("get_public_candidates");
 
       if (!error && data) {
         setCandidatesCount(data.length);
