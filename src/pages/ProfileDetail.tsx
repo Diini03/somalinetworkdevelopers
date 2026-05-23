@@ -207,19 +207,7 @@ const ProfileDetail = () => {
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Banknote className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Expected Salary</p>
-                    <p className="font-semibold">
-                      £{candidate.expectedSalary.min.toLocaleString()}-£
-                      {candidate.expectedSalary.max.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-5 h-5 text-primary" />
                   </div>
