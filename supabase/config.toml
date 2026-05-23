@@ -1,10 +1,18 @@
 project_id = "nuicglnuihcnxhinpgxl"
 
+# Public — anonymous users send contact messages; input is strictly validated server-side
+# and the candidate's email is looked up via service role (never trusted from client).
 [functions.send-candidate-contact-email]
 verify_jwt = false
 
+# Admin-only: scoring uses AI credits. Requires a valid JWT; role is enforced inside.
 [functions.calculate-candidate-score]
-verify_jwt = false
+verify_jwt = true
 
+# Admin-only batch scoring.
 [functions.batch-score-candidates]
+verify_jwt = true
+
+# Returns short-lived signed URLs for private CV files. Requires authentication.
+[functions.get-cv-signed-url]
 verify_jwt = true

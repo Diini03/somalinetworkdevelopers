@@ -21,34 +21,24 @@ const Candidates = () => {
 
   useEffect(() => {
     const fetchCandidates = async () => {
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("*")
-        .order("ai_score", { ascending: false, nullsFirst: false })
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.rpc("get_public_candidates");
 
       if (!error && data) {
-        const transformedData: Candidate[] = data.map((c) => ({
+        const transformedData: Candidate[] = data.map((c: any) => ({
           id: c.id,
           name: c.name,
           title: c.title,
           photo: c.photo,
-          skills: c.skills,
-          expectedSalary: {
-            min: c.expected_salary_min,
-            max: c.expected_salary_max,
-          },
+          skills: c.skills || [],
           location: c.location,
           qualification: c.qualification,
           bio: c.bio,
-          email: c.email,
           linkedin: c.linkedin,
           github: c.github,
           portfolio: c.portfolio,
           experience: Array.isArray(c.experience) ? (c.experience as any[]) : [],
           availability: c.availability,
           certifications: c.certifications || [],
-          cv: c.cv,
         }));
         setCandidates(transformedData);
       }
@@ -118,13 +108,9 @@ const Candidates = () => {
           return false;
       }
 
-      // Salary filter
-      if (
-        candidate.expectedSalary.max < filters.salaryMin ||
-        candidate.expectedSalary.min > filters.salaryMax
-      ) {
-        return false;
-      }
+      // Salary filter removed from public view (PII)
+
+
 
       return true;
     });

@@ -6,13 +6,13 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+
 interface InlineContactFormProps {
   candidateId: string;
-  candidateEmail: string;
   candidateName: string;
 }
 
-export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }: InlineContactFormProps) => {
+export const InlineContactForm = ({ candidateId, candidateName }: InlineContactFormProps) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -27,7 +27,6 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
     setLoading(true);
 
     try {
-      // Basic client-side validation
       if (
         formData.name.length > 100 ||
         formData.email.length > 255 ||
@@ -43,12 +42,11 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
         return;
       }
 
-      // Try backend email first via Edge Function (Resend). Fallback to mailto.
-      const { data, error } = await supabase.functions.invoke('send-candidate-contact-email', {
+      // Note: candidateEmail is NOT sent from the client anymore.
+      // The edge function looks it up via service role to prevent PII leakage.
+      const { error } = await supabase.functions.invoke("send-candidate-contact-email", {
         body: {
           candidateId,
-          candidateEmail,
-          candidateName,
           senderName: formData.name,
           senderEmail: formData.email,
           subject: formData.subject,
@@ -57,18 +55,11 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
       });
 
       if (error) {
-        const mailto = `mailto:${encodeURIComponent(candidateEmail)}?subject=${encodeURIComponent(
-          formData.subject
-        )}&body=${encodeURIComponent(
-          `From: ${formData.name} <${formData.email}>\n\n${formData.message}`
-        )}`;
         toast({
-          title: "Email service unavailable",
-          description: "Opening your email client as a fallback.",
+          title: "Could not send message",
+          description: "Please try again later.",
           variant: "destructive",
         });
-        window.location.href = mailto;
-        setFormData({ name: "", email: "", subject: "", message: "" });
         return;
       }
 
@@ -79,10 +70,10 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
 
       setFormData({ name: "", email: "", subject: "", message: "" });
     } catch (error) {
-      console.error("Error opening email client:", error);
+      console.error("Error sending message:", error);
       toast({
         title: "Error",
-        description: "Could not open email client. Please try again.",
+        description: "Could not send your message. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -98,62 +89,54 @@ export const InlineContactForm = ({ candidateId, candidateEmail, candidateName }
           Fill out the form below to contact {candidateName}
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="name">Your Name</Label>
           <Input
             id="name"
             value={formData.name}
-            onChange={(e) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
             placeholder="John Doe"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="email">Your Email</Label>
           <Input
             id="email"
             type="email"
             value={formData.email}
-            onChange={(e) =>
-              setFormData({ ...formData, email: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             required
             placeholder="john@example.com"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="subject">Subject</Label>
           <Input
             id="subject"
             value={formData.subject}
-            onChange={(e) =>
-              setFormData({ ...formData, subject: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
             required
             placeholder="Job Opportunity"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="message">Message</Label>
           <Textarea
             id="message"
             value={formData.message}
-            onChange={(e) =>
-              setFormData({ ...formData, message: e.target.value })
-            }
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
             required
             placeholder="I'd like to discuss..."
             rows={5}
           />
         </div>
-        
+
         <Button
           type="submit"
           disabled={loading}
