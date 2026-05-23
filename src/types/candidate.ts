@@ -11,19 +11,20 @@ export interface Candidate {
   title: string;
   photo: string;
   skills: string[];
-  expectedSalary: {
+  // Sensitive fields — only populated for admin views; never returned to public.
+  expectedSalary?: {
     min: number;
     max: number;
   };
+  email?: string;
+  cv?: string;
   location: string;
   qualification: string;
   bio: string;
-  email: string;
   linkedin?: string;
   github?: string;
   portfolio?: string;
   experience: ExperienceEntry[];
   availability: string;
   certifications?: string[];
-  cv?: string;
 }

@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate, ExperienceEntry } from "@/types/candidate";
 import { InlineContactForm } from "@/components/InlineContactForm";
+import { useToast } from "@/hooks/use-toast";
 import {
   MapPin,
-  Banknote,
   GraduationCap,
   Clock,
   ExternalLink,
@@ -22,41 +22,35 @@ import {
 const ProfileDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [candidate, setCandidate] = useState<Candidate | null>(null);
   const [loading, setLoading] = useState(true);
+  const [hasCv, setHasCv] = useState(false);
+  const [cvLoading, setCvLoading] = useState(false);
 
   useEffect(() => {
     const fetchCandidate = async () => {
       if (!id) return;
 
-      const { data, error } = await supabase
-        .from("candidates")
-        .select("*")
-        .eq("id", id)
-        .maybeSingle();
+      const { data, error } = await supabase.rpc("get_public_candidate", { _id: id });
+      const row = Array.isArray(data) ? data[0] : data;
 
-      if (!error && data) {
+      if (!error && row) {
         const transformedData: Candidate = {
-          id: data.id,
-          name: data.name,
-          title: data.title,
-          photo: data.photo,
-          skills: data.skills,
-          expectedSalary: {
-            min: data.expected_salary_min,
-            max: data.expected_salary_max,
-          },
-          location: data.location,
-          qualification: data.qualification,
-          bio: data.bio,
-          email: data.email,
-          linkedin: data.linkedin,
-          github: data.github,
-          portfolio: data.portfolio,
-          experience: Array.isArray(data.experience) ? (data.experience as unknown as ExperienceEntry[]) : [],
-          availability: data.availability,
-          certifications: data.certifications || [],
-          cv: data.cv,
+          id: row.id,
+          name: row.name,
+          title: row.title,
+          photo: row.photo,
+          skills: row.skills || [],
+          location: row.location,
+          qualification: row.qualification,
+          bio: row.bio,
+          linkedin: row.linkedin,
+          github: row.github,
+          portfolio: row.portfolio,
+          experience: Array.isArray(row.experience) ? (row.experience as unknown as ExperienceEntry[]) : [],
+          availability: row.availability,
+          certifications: row.certifications || [],
         };
         setCandidate(transformedData);
       }
@@ -65,6 +59,37 @@ const ProfileDetail = () => {
 
     fetchCandidate();
   }, [id]);
+
+  // Separately check (admin-only direct query allowed by RLS) whether a CV exists,
+  // without exposing its URL. We just probe the public-safe metadata via a head request
+  // — here we infer presence by trying to request a signed URL on demand.
+  useEffect(() => {
+    if (!id) return;
+    // Optimistically assume a CV may exist; the button handler will report if it doesn't.
+    setHasCv(true);
+  }, [id]);
+
+  const openCv = async () => {
+    if (!candidate) return;
+    setCvLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("get-cv-signed-url", {
+        body: { candidateId: candidate.id },
+      });
+      if (error || !data?.url) {
+        toast({
+          title: "CV unavailable",
+          description: "You need to be signed in, or this candidate has no CV uploaded.",
+          variant: "destructive",
+        });
+        setHasCv(false);
+        return;
+      }
+      window.open(data.url, "_blank", "noopener,noreferrer");
+    } finally {
+      setCvLoading(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -182,19 +207,7 @@ const ProfileDetail = () => {
 
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Banknote className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Expected Salary</p>
-                    <p className="font-semibold">
-                      £{candidate.expectedSalary.min.toLocaleString()}-£
-                      {candidate.expectedSalary.max.toLocaleString()}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-5 h-5 text-primary" />
                   </div>
@@ -226,98 +239,22 @@ const ProfileDetail = () => {
               </div>
             </div>
 
-            {/* Resume/CV Section */}
-            {candidate.cv && (
+            {/* Resume/CV Section — requires authentication; URL is short-lived signed link */}
+            {hasCv && (
               <div className="glass rounded-2xl p-6 border border-border/50 shadow-card space-y-4">
                 <h3 className="font-bold text-lg">Resume</h3>
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    View the resume of {candidate.name.split(' ')[0]}
+                    View the resume of {candidate.name.split(' ')[0]} (sign-in required)
                   </p>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => {
-                        const link = document.createElement('a');
-                        link.href = candidate.cv!;
-                        link.target = '_blank';
-                        link.rel = 'noopener noreferrer';
-                        link.download = `${candidate.name.replace(/\s+/g, '_')}_CV.pdf`;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                      }}
-                      variant="outline"
-                      className="flex-1"
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      Download CV
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        const iframe = document.createElement('iframe');
-                        iframe.src = `https://docs.google.com/viewer?url=${encodeURIComponent(candidate.cv!)}&embedded=true`;
-                        iframe.style.width = '100%';
-                        iframe.style.height = '600px';
-                        iframe.style.border = 'none';
-                        
-                        const modal = document.createElement('div');
-                        modal.style.cssText = `
-                          position: fixed;
-                          top: 0;
-                          left: 0;
-                          width: 100%;
-                          height: 100%;
-                          background: rgba(0,0,0,0.8);
-                          z-index: 9999;
-                          display: flex;
-                          align-items: center;
-                          justify-content: center;
-                          padding: 20px;
-                        `;
-                        
-                        const container = document.createElement('div');
-                        container.style.cssText = `
-                          background: white;
-                          border-radius: 8px;
-                          width: 90%;
-                          height: 90%;
-                          position: relative;
-                          overflow: hidden;
-                        `;
-                        
-                        const closeBtn = document.createElement('button');
-                        closeBtn.innerHTML = '✕';
-                        closeBtn.style.cssText = `
-                          position: absolute;
-                          top: 10px;
-                          right: 10px;
-                          z-index: 10000;
-                          background: #dc2626;
-                          color: white;
-                          border: none;
-                          border-radius: 50%;
-                          width: 30px;
-                          height: 30px;
-                          font-size: 16px;
-                          cursor: pointer;
-                        `;
-                        
-                        closeBtn.onclick = () => document.body.removeChild(modal);
-                        modal.onclick = (e) => {
-                          if (e.target === modal) document.body.removeChild(modal);
-                        };
-                        
-                        container.appendChild(closeBtn);
-                        container.appendChild(iframe);
-                        modal.appendChild(container);
-                        document.body.appendChild(modal);
-                      }}
-                      className="flex-1 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
-                    >
-                      <FileText className="w-4 h-4 mr-2" />
-                      View CV
-                    </Button>
-                  </div>
+                  <Button
+                    onClick={openCv}
+                    disabled={cvLoading}
+                    className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold transition-all duration-300"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    {cvLoading ? "Opening..." : "View CV"}
+                  </Button>
                 </div>
               </div>
             )}
@@ -392,9 +329,9 @@ const ProfileDetail = () => {
             )}
 
             {/* Contact Form */}
+            {/* Contact Form — candidate email looked up server-side */}
             <InlineContactForm
               candidateId={candidate.id}
-              candidateEmail={candidate.email}
               candidateName={candidate.name}
             />
           </div>

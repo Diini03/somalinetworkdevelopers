@@ -10,20 +10,10 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface ContactEmailRequest {
-  candidateId: string;
-  candidateEmail: string;
-  candidateName: string;
-  senderName: string;
-  senderEmail: string;
-  subject: string;
-  message: string;
-}
-
+// NOTE: candidateEmail / candidateName are NOT accepted from the client.
+// They are looked up server-side via service role to prevent leaking PII or spoofing.
 const contactSchema = z.object({
   candidateId: z.string().uuid(),
-  candidateEmail: z.string().trim().email().max(255),
-  candidateName: z.string().trim().min(1).max(100),
   senderName: z.string().trim().min(1).max(100),
   senderEmail: z.string().trim().email().max(255),
   subject: z.string().trim().min(1).max(150),
@@ -37,6 +27,7 @@ const escapeHtml = (s: string) =>
     .replace(/>/g, "&gt;")
     .replace(/\"/g, "&quot;")
     .replace(/'/g, "&#039;");
+
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -55,14 +46,33 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const { candidateId, candidateEmail, candidateName, senderName, senderEmail, subject, message } = parsed.data;
+    const { candidateId, senderName, senderEmail, subject, message } = parsed.data;
+
+    // Server-side lookup of candidate email & name (never trust the client)
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseLookup = createClient(supabaseUrl, supabaseKey);
+
+    const { data: candidateRow, error: lookupErr } = await supabaseLookup
+      .from("candidates")
+      .select("email, name")
+      .eq("id", candidateId)
+      .maybeSingle();
+
+    if (lookupErr || !candidateRow || !candidateRow.email) {
+      return new Response(
+        JSON.stringify({ error: "Candidate not found" }),
+        { status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const candidateEmail = candidateRow.email;
+    const candidateName = candidateRow.name;
 
     console.log("Sending contact email to:", candidateEmail);
 
-    // Create Supabase client for logging
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabase = supabaseLookup;
+
 
     // Prepare safe content and from address
     const fromEnv = Deno.env.get("RESEND_FROM");
