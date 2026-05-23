@@ -186,6 +186,48 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_candidate: {
+        Args: { _id: string }
+        Returns: {
+          ai_score: number
+          availability: string
+          bio: string
+          certifications: string[]
+          created_at: string
+          experience: Json
+          github: string
+          id: string
+          linkedin: string
+          location: string
+          name: string
+          photo: string
+          portfolio: string
+          qualification: string
+          skills: string[]
+          title: string
+        }[]
+      }
+      get_public_candidates: {
+        Args: never
+        Returns: {
+          ai_score: number
+          availability: string
+          bio: string
+          certifications: string[]
+          created_at: string
+          experience: Json
+          github: string
+          id: string
+          linkedin: string
+          location: string
+          name: string
+          photo: string
+          portfolio: string
+          qualification: string
+          skills: string[]
+          title: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
