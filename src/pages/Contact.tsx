@@ -8,180 +8,103 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Message sent! We'll get back to you soon.");
+    toast.success("Message sent. We'll be in touch soon.");
     setFormData({ name: "", email: "", subject: "", message: "" });
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
   };
+
+  const inputCls = "bg-foreground/5 border-0 rounded-2xl px-4 h-12";
 
   return (
     <div className="min-h-screen">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto max-w-4xl text-center space-y-6 animate-fade-in-up">
-          <div className="inline-block px-4 py-2 rounded-full bg-primary/10 border border-primary/30 text-primary font-medium text-sm mb-4">
-            Get In Touch
-          </div>
-
-          <h1 className="text-5xl sm:text-6xl font-bold leading-tight">
-            <span className="bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Connect with
-            </span>
-            <br />
-            <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-              SND Community
-            </span>
+      <section className="relative pt-36 pb-12 px-4 overflow-hidden noise">
+        <div className="orb animate-float-slow bg-primary/30 w-[380px] h-[380px] -top-20 -left-20" />
+        <div className="container mx-auto max-w-5xl relative z-10">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-6 animate-fade-in">Contact</div>
+          <h1 className="font-display text-[clamp(2.5rem,8vw,6rem)] leading-[0.95] tracking-tight animate-fade-in-up">
+            Let's <span className="italic">talk.</span>
           </h1>
-
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Have a question or idea? Reach out and become part of the Somali Network 
-            Developers community.
+          <p className="mt-6 text-lg text-muted-foreground max-w-2xl animate-fade-in-up" style={{ animationDelay: '120ms' }}>
+            Have a question, idea, or want to join the community? Drop us a line.
           </p>
         </div>
       </section>
 
-      {/* Contact Form & Info */}
       <section className="pb-32 px-4">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid lg:grid-cols-5 gap-8">
-            {/* Contact Info */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="glass rounded-2xl p-8 border border-border/50 shadow-card space-y-6">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary-glow/20 flex items-center justify-center">
-                    <Mail className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">Email Us</h3>
-                    <p className="text-muted-foreground text-sm">
-                      We're here to help with any questions
-                    </p>
-                    <a
-                      href="mailto:info@somalinetdev.com"
-                      className="text-primary hover:text-primary-glow transition-colors inline-block mt-2"
-                    >
-                      info@somalinetdev.com
-                    </a>
-                  </div>
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid lg:grid-cols-5 gap-6">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="glass rounded-3xl p-7 space-y-5">
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Mail className="w-5 h-5 text-primary" />
                 </div>
-
-                <div className="h-px bg-border/50" />
-
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-primary-glow/20 flex items-center justify-center">
-                    <MessageSquare className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-lg mb-2">Live Chat</h3>
-                    <p className="text-muted-foreground text-sm">
-                      Chat with our team for instant support
-                    </p>
-                    <button className="text-primary hover:text-primary-glow transition-colors inline-block mt-2">
-                      Start a conversation
-                    </button>
-                  </div>
+                <div>
+                  <h3 className="font-display text-2xl mb-1">Email</h3>
+                  <p className="text-sm text-muted-foreground mb-2">We're here to help.</p>
+                  <a href="mailto:info@somalinetdev.com" className="text-foreground story-link text-sm font-medium">
+                    info@somalinetdev.com
+                  </a>
                 </div>
               </div>
 
-              <div className="glass rounded-2xl p-6 border border-border/50 shadow-card">
-                <h4 className="font-semibold mb-3">Office Hours</h4>
-                <div className="space-y-2 text-sm text-muted-foreground">
-                  <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                  <p>Saturday: 10:00 AM - 4:00 PM</p>
-                  <p>Sunday: Closed</p>
+              <div className="glass rounded-3xl p-7 space-y-5">
+                <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-display text-2xl mb-1">Live chat</h3>
+                  <p className="text-sm text-muted-foreground mb-2">Instant support from the team.</p>
+                  <button className="text-foreground story-link text-sm font-medium">
+                    Start a conversation
+                  </button>
+                </div>
+              </div>
+
+              <div className="glass rounded-3xl p-7">
+                <div className="text-xs uppercase tracking-widest text-muted-foreground mb-3">Office Hours</div>
+                <div className="space-y-1 text-sm text-foreground">
+                  <p>Mon–Fri · 9:00 — 18:00</p>
+                  <p>Sat · 10:00 — 16:00</p>
+                  <p className="text-muted-foreground">Sun · Closed</p>
                 </div>
               </div>
             </div>
 
-            {/* Contact Form */}
             <div className="lg:col-span-3">
-              <form
-                onSubmit={handleSubmit}
-                className="glass rounded-2xl p-8 border border-border/50 shadow-card space-y-6"
-              >
-                <div className="space-y-4">
-                  <div className="grid sm:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="name" className="font-semibold">
-                        Your Name
-                      </Label>
-                      <Input
-                        id="name"
-                        placeholder="John Doe"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="glass border-border/50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email" className="font-semibold">
-                        Email Address
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="john@example.com"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        className="glass border-border/50"
-                      />
-                    </div>
-                  </div>
-
+              <form onSubmit={handleSubmit} className="glass-strong rounded-3xl p-8 sm:p-10 space-y-6">
+                <div className="grid sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="subject" className="font-semibold">
-                      Subject
-                    </Label>
-                    <Input
-                      id="subject"
-                      placeholder="What's this about?"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      className="glass border-border/50"
-                    />
+                    <Label htmlFor="name" className="text-[11px] uppercase tracking-widest text-muted-foreground">Name</Label>
+                    <Input id="name" placeholder="John Doe" value={formData.name} onChange={handleChange} required className={inputCls} />
                   </div>
-
                   <div className="space-y-2">
-                    <Label htmlFor="message" className="font-semibold">
-                      Message
-                    </Label>
-                    <Textarea
-                      id="message"
-                      placeholder="Tell us more..."
-                      rows={6}
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      className="glass border-border/50 resize-none"
-                    />
+                    <Label htmlFor="email" className="text-[11px] uppercase tracking-widest text-muted-foreground">Email</Label>
+                    <Input id="email" type="email" placeholder="john@example.com" value={formData.email} onChange={handleChange} required className={inputCls} />
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105 group"
-                >
-                  Send Message
-                  <Send className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                <div className="space-y-2">
+                  <Label htmlFor="subject" className="text-[11px] uppercase tracking-widest text-muted-foreground">Subject</Label>
+                  <Input id="subject" placeholder="What's this about?" value={formData.subject} onChange={handleChange} required className={inputCls} />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message" className="text-[11px] uppercase tracking-widest text-muted-foreground">Message</Label>
+                  <Textarea id="message" placeholder="Tell us more…" rows={7} value={formData.message} onChange={handleChange} required className="bg-foreground/5 border-0 rounded-2xl p-4 resize-none" />
+                </div>
+
+                <Button type="submit" size="lg" className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary-glow font-semibold group h-12">
+                  Send message
+                  <Send className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
                 </Button>
               </form>
             </div>

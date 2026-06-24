@@ -81,70 +81,38 @@ export const InlineContactForm = ({ candidateId, candidateName }: InlineContactF
     }
   };
 
+  const inputCls = "bg-foreground/5 border-0 rounded-2xl px-4 h-11";
   return (
-    <div id="contact-form" className="glass rounded-2xl p-6 border border-primary/30 shadow-card bg-gradient-to-br from-primary/5 to-transparent space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-2">Get in Touch</h2>
-        <p className="text-muted-foreground">
-          Fill out the form below to contact {candidateName}
-        </p>
+    <div id="contact-form" className="glass-strong rounded-3xl p-8 shadow-float space-y-6">
+      <div>
+        <div className="text-xs uppercase tracking-widest text-primary mb-2">Get in touch</div>
+        <h2 className="font-display text-3xl leading-tight">Reach out to {candidateName}</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="name">Your Name</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-            placeholder="John Doe"
-          />
+          <Label htmlFor="name" className="text-[11px] uppercase tracking-widest text-muted-foreground">Your name</Label>
+          <Input id="name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required placeholder="John Doe" className={inputCls} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email">Your Email</Label>
-          <Input
-            id="email"
-            type="email"
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-            required
-            placeholder="john@example.com"
-          />
+          <Label htmlFor="email" className="text-[11px] uppercase tracking-widest text-muted-foreground">Your email</Label>
+          <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required placeholder="john@example.com" className={inputCls} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="subject">Subject</Label>
-          <Input
-            id="subject"
-            value={formData.subject}
-            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-            required
-            placeholder="Job Opportunity"
-          />
+          <Label htmlFor="subject" className="text-[11px] uppercase tracking-widest text-muted-foreground">Subject</Label>
+          <Input id="subject" value={formData.subject} onChange={(e) => setFormData({ ...formData, subject: e.target.value })} required placeholder="Job opportunity" className={inputCls} />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="message">Message</Label>
-          <Textarea
-            id="message"
-            value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            required
-            placeholder="I'd like to discuss..."
-            rows={5}
-          />
+          <Label htmlFor="message" className="text-[11px] uppercase tracking-widest text-muted-foreground">Message</Label>
+          <Textarea id="message" value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} required placeholder="I'd like to discuss…" rows={5} className="bg-foreground/5 border-0 rounded-2xl p-4 resize-none" />
         </div>
 
-        <Button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold"
-          size="lg"
-        >
-          <Mail className="w-5 h-5 mr-2" />
-          {loading ? "Sending..." : "Send Message"}
+        <Button type="submit" disabled={loading} className="w-full h-12 rounded-full bg-primary text-primary-foreground hover:bg-primary-glow font-semibold" size="lg">
+          <Mail className="w-4 h-4 mr-2" />
+          {loading ? "Sending…" : "Send message"}
         </Button>
       </form>
     </div>
