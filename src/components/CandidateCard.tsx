@@ -1,7 +1,6 @@
 import { Candidate } from "@/types/candidate";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { MapPin, ArrowRight, Linkedin, Github, Globe } from "lucide-react";
+import { MapPin, ArrowUpRight, Linkedin, Github, Globe } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface CandidateCardProps {
@@ -10,98 +9,72 @@ interface CandidateCardProps {
 
 export const CandidateCard = ({ candidate }: CandidateCardProps) => {
   return (
-    <div className="glass rounded-2xl p-6 border border-border/50 shadow-card hover:shadow-card-hover transition-all duration-300 group animate-scale-in">
-      <div className="space-y-4 flex flex-col items-center text-center">
-        {/* Header */}
-        <div className="flex flex-col items-center gap-3">
-          <div className="relative">
-            <img
-              src={candidate.photo}
-              alt={candidate.name}
-              className="w-32 h-32 rounded-xl object-cover ring-2 ring-border/50 group-hover:ring-primary/50 transition-all duration-300"
-            />
-            <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-card" />
-          </div>
-          <div className="space-y-1">
-            <h3 className="font-bold text-xl text-foreground group-hover:text-primary transition-colors">
-              {candidate.name}
-            </h3>
-            <p className="text-base text-muted-foreground">{candidate.title}</p>
-          </div>
-        </div>
+    <Link
+      to={`/profile/${candidate.id}`}
+      className="group relative block glass rounded-3xl p-6 hover-lift hover:shadow-float overflow-hidden animate-scale-in"
+    >
+      {/* Hover accent corner */}
+      <div className="absolute top-5 right-5 w-9 h-9 rounded-full bg-foreground/5 group-hover:bg-primary flex items-center justify-center transition-all duration-300">
+        <ArrowUpRight className="w-4 h-4 text-foreground group-hover:text-primary-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+      </div>
 
-        {/* Skills */}
-        <div className="flex flex-wrap gap-2 justify-center">
-          {candidate.skills.slice(0, 4).map((skill) => (
-            <Badge
-              key={skill}
-              variant="secondary"
-              className="bg-secondary/50 hover:bg-primary/10 hover:text-primary transition-colors text-xs"
-            >
-              {skill}
-            </Badge>
-          ))}
-          {candidate.skills.length > 4 && (
-            <Badge variant="secondary" className="bg-secondary/50 text-xs">
-              +{candidate.skills.length - 4}
-            </Badge>
-          )}
+      <div className="flex items-start gap-4">
+        <div className="relative shrink-0">
+          <img
+            src={candidate.photo}
+            alt={candidate.name}
+            className="w-16 h-16 rounded-2xl object-cover"
+          />
+          <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-primary rounded-full border-2 border-background" />
         </div>
+        <div className="min-w-0 pt-1">
+          <h3 className="font-display text-2xl leading-tight text-foreground truncate">
+            {candidate.name}
+          </h3>
+          <p className="text-sm text-muted-foreground truncate">{candidate.title}</p>
+        </div>
+      </div>
 
-        {/* Location */}
-        <div className="flex items-center gap-2 text-sm text-muted-foreground justify-center">
-          <MapPin className="w-4 h-4 text-primary" />
+      <div className="mt-5 flex flex-wrap gap-1.5">
+        {candidate.skills.slice(0, 4).map((skill) => (
+          <Badge
+            key={skill}
+            variant="secondary"
+            className="bg-foreground/5 hover:bg-foreground/10 text-foreground border-0 rounded-full text-[11px] font-medium px-2.5 py-0.5"
+          >
+            {skill}
+          </Badge>
+        ))}
+        {candidate.skills.length > 4 && (
+          <Badge variant="secondary" className="bg-foreground/5 text-muted-foreground border-0 rounded-full text-[11px] font-medium px-2.5 py-0.5">
+            +{candidate.skills.length - 4}
+          </Badge>
+        )}
+      </div>
+
+      <div className="mt-5 pt-5 border-t border-border/60 flex items-center justify-between">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <MapPin className="w-3.5 h-3.5" />
           <span>{candidate.location}</span>
         </div>
-
-        {/* Social Links */}
-        <div className="flex items-center gap-3 justify-center pt-2">
+        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
           {candidate.linkedin && (
-            <a
-              href={candidate.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
-            >
-              <Linkedin className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            <a href={candidate.linkedin} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-foreground/10 transition-colors" aria-label="LinkedIn">
+              <Linkedin className="w-3.5 h-3.5 text-muted-foreground" />
             </a>
           )}
           {candidate.github && (
-            <a
-              href={candidate.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
-            >
-              <Github className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            <a href={candidate.github} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-foreground/10 transition-colors" aria-label="GitHub">
+              <Github className="w-3.5 h-3.5 text-muted-foreground" />
             </a>
           )}
           {candidate.portfolio && (
-            <a
-              href={candidate.portfolio}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-all duration-300 group/social"
-            >
-              <Globe className="w-4 h-4 text-primary group-hover/social:scale-110 transition-transform" />
+            <a href={candidate.portfolio} target="_blank" rel="noopener noreferrer" className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-foreground/10 transition-colors" aria-label="Portfolio">
+              <Globe className="w-3.5 h-3.5 text-muted-foreground" />
             </a>
           )}
         </div>
-
-        {/* Action Button */}
-        <div className="w-full pt-2">
-          <Link to={`/profile/${candidate.id}`} className="block">
-            <Button
-              variant="outline"
-              className="w-full font-semibold group/btn transition-all duration-300"
-              size="lg"
-            >
-              View Profile
-              <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-            </Button>
-          </Link>
-        </div>
       </div>
-    </div>
+    </Link>
   );
 };

@@ -131,23 +131,21 @@ const Candidates = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
-      
-      {/* Page Header */}
-      <div className="pt-24 pb-8 px-4 border-b border-border/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-              All Candidates
-            </span>
+
+      <div className="relative pt-32 pb-10 px-4 overflow-hidden noise">
+        <div className="orb animate-float-slow bg-primary/25 w-[360px] h-[360px] -top-20 -right-20" />
+        <div className="container mx-auto max-w-6xl relative z-10">
+          <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4">Directory</div>
+          <h1 className="font-display text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.95] tracking-tight">
+            All <span className="italic">candidates.</span>
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Browse through our talented developer candidates
+          <p className="mt-4 text-base text-muted-foreground max-w-xl">
+            Browse our network of Somali developers, designers, and engineers.
           </p>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Horizontal Filters */}
+      <div className="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
         <HorizontalFilters
           filters={filters}
           onFilterChange={setFilters}
@@ -156,11 +154,10 @@ const Candidates = () => {
           availableQualifications={availableQualifications}
         />
 
-        {/* Main Content */}
-        <main>
+        <main className="mt-8">
           {loading ? (
             <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="animate-spin rounded-full h-10 w-10 border-2 border-primary border-t-transparent"></div>
             </div>
           ) : (
             <CandidateGrid candidates={filteredCandidates} variant="large" />

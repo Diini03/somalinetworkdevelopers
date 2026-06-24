@@ -1,11 +1,10 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, Moon, Sun, LogOut } from "lucide-react";
+import { Menu, X, User, Moon, Sun, LogOut, ArrowUpRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useTheme } from "next-themes";
-import sndLogo from "@/assets/snd-icon.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,56 +26,29 @@ export const Navbar = () => {
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out",
-        variant: "destructive",
-      });
+      toast({ title: "Error", description: "Failed to log out", variant: "destructive" });
     } else {
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out",
-      });
+      toast({ title: "Logged out", description: "You've been successfully logged out" });
       navigate("/");
     }
   };
 
   useEffect(() => {
-    // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserName(session.user.id);
-      }
+      if (session?.user) fetchUserName(session.user.id);
     });
-
-    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserName(session.user.id);
-      } else {
-        setUserName("");
-      }
+      if (session?.user) fetchUserName(session.user.id);
+      else setUserName("");
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
   const fetchUserName = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('name')
-      .eq('id', userId)
-      .single();
-    
-    if (data && !error) {
-      setUserName(data.name);
-    }
-  };
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark");
+    const { data } = await supabase.from('profiles').select('name').eq('id', userId).single();
+    if (data) setUserName(data.name);
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -89,171 +61,138 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center space-x-3 group">
-            <img 
-              src={sndLogo} 
-              alt="SND Logo" 
-              className="w-10 h-10 transition-all duration-300 group-hover:scale-110"
-            />
-            <span className="text-3xl font-black tracking-tighter uppercase bg-gradient-to-r from-[#418FDE] to-[#003366] bg-clip-text text-transparent transition-all duration-300 group-hover:tracking-tight" style={{ fontFamily: 'Futura, Gotham, Montserrat, sans-serif', fontWeight: 900 }}>
-              SND
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                  isActive(link.path)
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+    <nav className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-6xl">
+      <div className="glass-pill px-3 py-2 shadow-soft flex items-center justify-between gap-2">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2 pl-3 pr-2 group shrink-0">
+          <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
+            <span className="font-display text-base text-primary-foreground leading-none">S</span>
           </div>
+          <span className="font-display text-xl tracking-tight text-foreground">
+            SND<span className="text-primary">.</span>
+          </span>
+        </Link>
 
-          {/* Auth Buttons */}
-          <div className="hidden md:flex items-center space-x-3">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={toggleTheme}
-              className="font-medium"
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <Link
+              key={link.path}
+              to={link.path}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                isActive(link.path)
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
             >
-              {theme === "dark" ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </Button>
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="font-medium">
-                    <User className="w-4 h-4 mr-2" />
-                    {userName || "Profile"}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate("/profile")}>
-                    <User className="w-4 h-4 mr-2" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" className="font-medium">
-                    Login
-                  </Button>
-                </Link>
-                <Link to="/signup">
-                  <Button className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold glow-accent-sm transition-all duration-300 hover:scale-105">
-                    Get Started
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-secondary/50 transition-colors"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? (
-              <X className="w-6 h-6 text-foreground" />
-            ) : (
-              <Menu className="w-6 h-6 text-foreground" />
-            )}
-          </button>
+              {link.label}
+            </Link>
+          ))}
         </div>
+
+        {/* Right cluster */}
+        <div className="hidden md:flex items-center gap-2">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="w-9 h-9 rounded-full flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-foreground/5 transition-all"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-foreground/5 hover:bg-foreground/10 transition-all text-sm font-medium">
+                  <User className="w-4 h-4" />
+                  <span className="max-w-[100px] truncate">{userName || "Profile"}</span>
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 glass-strong rounded-2xl">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate("/profile")}>
+                  <User className="w-4 h-4 mr-2" /> Profile
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                  <LogOut className="w-4 h-4 mr-2" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="px-4 py-2 rounded-full text-sm font-medium text-muted-foreground hover:text-foreground transition-all"
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className="group flex items-center gap-1 pl-4 pr-3 py-2 rounded-full bg-primary text-primary-foreground text-sm font-semibold hover:bg-primary-glow transition-all"
+              >
+                Get Started
+                <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            </>
+          )}
+        </div>
+
+        {/* Mobile Toggle */}
+        <button
+          className="md:hidden w-10 h-10 rounded-full flex items-center justify-center hover:bg-foreground/5 transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Menu"
+        >
+          {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden glass border-t border-border/50 animate-fade-in">
-          <div className="container mx-auto px-4 py-4 space-y-2">
+        <div className="md:hidden mt-2 glass-strong rounded-3xl p-4 shadow-float animate-fade-in">
+          <div className="space-y-1">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
                 to={link.path}
                 onClick={() => setMobileMenuOpen(false)}
-                className={`block px-4 py-3 rounded-lg font-medium transition-all ${
+                className={`block px-4 py-3 rounded-2xl text-sm font-medium transition-all ${
                   isActive(link.path)
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                    ? "bg-foreground text-background"
+                    : "text-muted-foreground hover:text-foreground hover:bg-foreground/5"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-            <div className="pt-4 space-y-2">
-              <Button
-                variant="ghost"
-                className="w-full font-medium justify-start"
-                onClick={toggleTheme}
+            <div className="pt-3 mt-3 border-t border-border/50 space-y-1">
+              <button
+                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                className="w-full flex items-center gap-2 px-4 py-3 rounded-2xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5"
               >
-                {theme === "dark" ? (
-                  <>
-                    <Sun className="w-4 h-4 mr-2" />
-                    Light Mode
-                  </>
-                ) : (
-                  <>
-                    <Moon className="w-4 h-4 mr-2" />
-                    Dark Mode
-                  </>
-                )}
-              </Button>
+                {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+                {theme === "dark" ? "Light Mode" : "Dark Mode"}
+              </button>
               {user ? (
                 <>
-                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full font-medium justify-start">
-                      <User className="w-4 h-4 mr-2" />
-                      {userName || "Profile"}
-                    </Button>
+                  <Link to="/profile" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-2xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5">
+                    <User className="w-4 h-4 inline mr-2" /> {userName || "Profile"}
                   </Link>
-                  <Button
-                    variant="ghost"
-                    className="w-full font-medium justify-start text-destructive"
-                    onClick={() => {
-                      setMobileMenuOpen(false);
-                      handleLogout();
-                    }}
+                  <button
+                    onClick={() => { setMobileMenuOpen(false); handleLogout(); }}
+                    className="w-full text-left px-4 py-3 rounded-2xl text-sm font-medium text-destructive hover:bg-destructive/10"
                   >
-                    <LogOut className="w-4 h-4 mr-2" />
-                    Logout
-                  </Button>
+                    <LogOut className="w-4 h-4 inline mr-2" /> Logout
+                  </button>
                 </>
               ) : (
                 <>
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="ghost" className="w-full font-medium">
-                      Login
-                    </Button>
+                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-2xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-foreground/5">
+                    Login
                   </Link>
-                  <Link to="/signup" onClick={() => setMobileMenuOpen(false)}>
-                    <Button className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 font-semibold">
-                      Get Started
-                    </Button>
+                  <Link to="/signup" onClick={() => setMobileMenuOpen(false)} className="block px-4 py-3 rounded-2xl text-sm font-semibold bg-primary text-primary-foreground text-center">
+                    Get Started
                   </Link>
                 </>
               )}
