@@ -13,63 +13,28 @@ export const ProtectedAdminRoute = ({ children }: ProtectedAdminRouteProps) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkAdmin = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (user) {
-        setUser(user);
-        
-        // Check if user has admin role
-        const { data: roles } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", user.id)
-          .eq("role", "admin")
-          .maybeSingle();
-        
-        setIsAdmin(!!roles);
-      }
-      
+    const check = async (u: User | null) => {
+      if (!u) { setUser(null); setIsAdmin(false); setLoading(false); return; }
+      setUser(u);
+      const { data } = await supabase.from("user_roles")
+        .select("role").eq("user_id", u.id).eq("role", "admin").maybeSingle();
+      setIsAdmin(!!data);
       setLoading(false);
     };
 
-    checkAdmin();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          
-          const { data: roles } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", session.user.id)
-            .eq("role", "admin")
-            .maybeSingle();
-          
-          setIsAdmin(!!roles);
-        } else {
-          setUser(null);
-          setIsAdmin(false);
-        }
-        setLoading(false);
-      }
-    );
-
+    supabase.auth.getUser().then(({ data }) => check(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => check(session?.user ?? null));
     return () => subscription.unsubscribe();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center min-h-screen bg-background">
+        <div className="caption">loading…</div>
       </div>
     );
   }
 
-  if (!user || !isAdmin) {
-    return <Navigate to="/login" replace />;
-  }
-
+  if (!user || !isAdmin) return <Navigate to="/admin/login" replace />;
   return <>{children}</>;
 };

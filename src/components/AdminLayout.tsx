@@ -1,101 +1,37 @@
-import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, LogOut, Menu, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-}
-
-export const AdminLayout = ({ children }: AdminLayoutProps) => {
+export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { toast } = useToast();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to log out",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Logged out",
-        description: "You've been successfully logged out",
-      });
-      navigate("/");
-    }
+  const logout = async () => {
+    await supabase.auth.signOut();
+    toast({ title: "Signed out" });
+    navigate("/");
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (p: string) => location.pathname === p;
+  const link = (p: string) => `caption block py-2 ${isActive(p) ? "text-primary" : "hover:text-foreground"}`;
 
   return (
-    <div className="flex min-h-screen bg-background">
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isSidebarOpen ? "w-64" : "w-20"
-        } bg-card border-r border-border transition-all duration-300 flex flex-col`}
-      >
-        <div className="p-4 border-b border-border flex items-center justify-between">
-          {isSidebarOpen && (
-            <h1 className="text-xl font-bold text-primary">Admin Panel</h1>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            {isSidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </Button>
-        </div>
-
-        <nav className="flex-1 p-4 space-y-2">
-          <Link
-            to="/admin"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive("/admin")
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted"
-            }`}
-          >
-            <LayoutDashboard size={20} />
-            {isSidebarOpen && <span>Dashboard</span>}
-          </Link>
-
-          <Link
-            to="/admin/candidates"
-            className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-              isActive("/admin/candidates")
-                ? "bg-primary text-primary-foreground"
-                : "hover:bg-muted"
-            }`}
-          >
-            <Users size={20} />
-            {isSidebarOpen && <span>Candidates</span>}
-          </Link>
+    <div className="min-h-screen bg-background text-foreground flex">
+      <aside className="w-64 border-r border-border p-6 flex flex-col">
+        <Link to="/admin" className="font-display text-3xl mb-1">SND<span className="text-primary">.</span></Link>
+        <div className="caption mb-12">Admin · v2</div>
+        <nav className="space-y-1 flex-1">
+          <Link to="/admin" className={link("/admin")}>→ Dashboard</Link>
+          <Link to="/admin/candidates" className={link("/admin/candidates")}>→ Candidates</Link>
         </nav>
-
-        <div className="p-4 border-t border-border">
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-3"
-            onClick={handleLogout}
-          >
-            <LogOut size={20} />
-            {isSidebarOpen && <span>Logout</span>}
-          </Button>
+        <div className="space-y-1 border-t border-border pt-6">
+          <Link to="/" className="caption block py-2 hover:text-foreground">↗ View site</Link>
+          <button onClick={logout} className="caption block py-2 hover:text-destructive text-left w-full">↗ Sign out</button>
         </div>
       </aside>
-
-      {/* Main content */}
       <main className="flex-1 overflow-auto">
-        <div className="container mx-auto p-8">{children}</div>
+        <div className="max-w-6xl mx-auto p-10">{children}</div>
       </main>
     </div>
   );
