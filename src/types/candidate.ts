@@ -11,11 +11,7 @@ export interface Candidate {
   title: string;
   photo: string;
   skills: string[];
-  // Sensitive fields — only populated for admin views; never returned to public.
-  expectedSalary?: {
-    min: number;
-    max: number;
-  };
+  expectedSalary?: { min: number; max: number };
   email?: string;
   cv?: string;
   location: string;
@@ -27,4 +23,5 @@ export interface Candidate {
   experience: ExperienceEntry[];
   availability: string;
   certifications?: string[];
+  aiScore?: number;
 }

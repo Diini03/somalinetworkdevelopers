@@ -2,12 +2,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
-import Home from "./pages/Home";
-import Directory from "./pages/Directory";
-import DevProfile from "./pages/DevProfile";
+import Console from "./pages/Console";
 import NotFound from "./pages/NotFound";
 import AdminLogin from "./pages/admin/AdminLogin";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
@@ -16,12 +13,6 @@ import { CandidatesManagement } from "./pages/admin/CandidatesManagement";
 
 const queryClient = new QueryClient();
 
-const ScrollToTop = () => {
-  const location = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [location.pathname]);
-  return null;
-};
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
@@ -29,15 +20,14 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ScrollToTop />
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/directory" element={<Directory />} />
-            <Route path="/dev/:id" element={<DevProfile />} />
+            <Route path="/" element={<Console />} />
+            <Route path="/dev/:id" element={<Console />} />
 
-            {/* Legacy redirects — public auth retired */}
-            <Route path="/candidates" element={<Navigate to="/directory" replace />} />
-            <Route path="/profile/:id" element={<LegacyProfileRedirect />} />
+            {/* Legacy redirects */}
+            <Route path="/directory" element={<Navigate to="/" replace />} />
+            <Route path="/candidates" element={<Navigate to="/" replace />} />
+            <Route path="/profile/:id" element={<Navigate to="/" replace />} />
             <Route path="/login" element={<Navigate to="/" replace />} />
             <Route path="/signup" element={<Navigate to="/" replace />} />
             <Route path="/profile" element={<Navigate to="/" replace />} />
@@ -56,12 +46,5 @@ const App = () => (
     </ThemeProvider>
   </QueryClientProvider>
 );
-
-// Translate old /profile/:id → /dev/:id
-import { useParams } from "react-router-dom";
-const LegacyProfileRedirect = () => {
-  const { id } = useParams();
-  return <Navigate to={`/dev/${id}`} replace />;
-};
 
 export default App;
