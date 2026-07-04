@@ -2,78 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SND — Editorial Noir
-   Paper & ink. Single muted gold accent. Hairline rules.
+/* SND v2.1 — Talent Discovery Console
+   Neutral product workbench. Single blue accent.
    All colors are HSL semantic tokens. */
 
 @layer base {
   :root {
-    /* Light — paper */
-    --background: 36 20% 96%;
-    --background-secondary: 36 18% 92%;
-    --foreground: 0 0% 8%;
+    --background: 0 0% 100%;
+    --surface: 220 14% 98%;
+    --surface-elevated: 0 0% 100%;
+    --foreground: 222 20% 12%;
 
-    --card: 36 20% 98%;
-    --card-foreground: 0 0% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 12%;
 
-    --popover: 36 20% 98%;
-    --popover-foreground: 0 0% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 20% 12%;
 
-    /* Muted editorial gold */
-    --primary: 42 55% 48%;
+    --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 42 60% 58%;
+    --primary-muted: 221 83% 96%;
 
-    --secondary: 36 14% 90%;
-    --secondary-foreground: 0 0% 8%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 222 20% 12%;
 
-    --muted: 36 14% 90%;
-    --muted-foreground: 0 0% 38%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 10% 46%;
 
-    --accent: 42 55% 48%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 220 14% 94%;
+    --accent-foreground: 222 20% 12%;
 
-    --destructive: 0 70% 45%;
+    --success: 142 71% 40%;
+    --warning: 38 92% 45%;
+
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 86%;
-    --input: 0 0% 88%;
-    --ring: 42 55% 48%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
 
-    --radius: 0.25rem;
+    --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark — ink */
-    --background: 0 0% 6%;
-    --background-secondary: 0 0% 9%;
-    --foreground: 36 20% 94%;
+    --background: 222 20% 7%;
+    --surface: 222 18% 10%;
+    --surface-elevated: 222 16% 13%;
+    --foreground: 210 20% 96%;
 
-    --card: 0 0% 8%;
-    --card-foreground: 36 20% 94%;
+    --card: 222 16% 11%;
+    --card-foreground: 210 20% 96%;
 
-    --popover: 0 0% 8%;
-    --popover-foreground: 36 20% 94%;
+    --popover: 222 16% 13%;
+    --popover-foreground: 210 20% 96%;
 
-    --primary: 42 55% 60%;
-    --primary-foreground: 0 0% 6%;
-    --primary-glow: 42 65% 70%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 222 20% 7%;
+    --primary-muted: 221 60% 18%;
 
-    --secondary: 0 0% 12%;
-    --secondary-foreground: 36 20% 94%;
+    --secondary: 222 14% 15%;
+    --secondary-foreground: 210 20% 96%;
 
-    --muted: 0 0% 11%;
-    --muted-foreground: 0 0% 60%;
+    --muted: 222 14% 14%;
+    --muted-foreground: 220 10% 65%;
 
-    --accent: 42 55% 60%;
-    --accent-foreground: 0 0% 6%;
+    --accent: 222 14% 17%;
+    --accent-foreground: 210 20% 96%;
+
+    --success: 142 70% 50%;
+    --warning: 38 92% 55%;
 
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 14%;
-    --ring: 42 55% 60%;
+    --border: 222 14% 18%;
+    --input: 222 14% 18%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -86,96 +91,37 @@
     @apply bg-background text-foreground antialiased;
     font-family: '"Inter Tight"', 'Inter Tight', system-ui, sans-serif;
     font-feature-settings: 'ss01', 'cv11';
-    overflow-x: hidden;
+    font-size: 14px;
   }
 
   #root { min-height: 100vh; }
 
   ::selection {
-    background: hsl(var(--primary));
-    color: hsl(var(--primary-foreground));
+    background: hsl(var(--primary) / 0.25);
+    color: hsl(var(--foreground));
   }
 }
 
 @layer utilities {
-  .font-display {
-    font-family: '"Instrument Serif"', 'Instrument Serif', 'Times New Roman', serif;
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    line-height: 0.95;
-  }
-
   .font-mono {
-    font-family: '"JetBrains Mono"', 'JetBrains Mono', ui-monospace, monospace;
-  }
-
-  /* Editorial mono caption — small uppercase, wide tracking */
-  .caption {
     font-family: '"JetBrains Mono"', ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+  }
+
+  .kbd {
+    font-family: '"JetBrains Mono"', ui-monospace, monospace;
+    font-size: 10.5px;
+    padding: 2px 5px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 4px;
+    background: hsl(var(--surface));
     color: hsl(var(--muted-foreground));
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
   }
 
-  /* Hairline rule */
-  .rule {
-    height: 1px;
-    background: hsl(var(--border));
-    width: 100%;
-  }
-  .rule-gold {
-    height: 1px;
-    background: hsl(var(--primary));
-    width: 100%;
-  }
+  .hairline { height: 1px; background: hsl(var(--border)); width: 100%; }
 
-  /* Drop cap for editorial intros */
-  .dropcap::first-letter {
-    font-family: '"Instrument Serif"', serif;
-    float: left;
-    font-size: 5.2em;
-    line-height: 0.85;
-    padding: 0.05em 0.1em 0 0;
-    color: hsl(var(--primary));
-    font-weight: 400;
-  }
-
-  /* Marquee */
-  .marquee {
-    display: flex;
-    overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, black 8%, black 92%, transparent);
-  }
-  .marquee-track {
-    display: flex;
-    gap: 3rem;
-    animation: marquee 60s linear infinite;
-    white-space: nowrap;
-  }
-  @keyframes marquee {
-    from { transform: translateX(0); }
-    to { transform: translateX(-50%); }
-  }
-
-  .story-link {
-    position: relative;
-    display: inline-block;
-  }
-  .story-link::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    transform: scaleX(0);
-    height: 1px;
-    bottom: -2px;
-    left: 0;
-    background: currentColor;
-    transform-origin: bottom right;
-    transition: transform 0.3s ease;
-  }
-  .story-link:hover::after {
-    transform: scaleX(1);
-    transform-origin: bottom left;
-  }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
 }
