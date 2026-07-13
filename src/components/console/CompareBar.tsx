@@ -34,9 +34,10 @@ export const CompareBar = ({ selected, max, onOpen, onRemove, onClear }: Props) 
         </div>
         <button
           onClick={onClear}
-          className="text-xs text-muted-foreground hover:text-foreground px-2 shrink-0"
+          className="h-9 px-2.5 rounded-md border border-border bg-surface text-muted-foreground hover:text-foreground hover:border-foreground/20 inline-flex items-center gap-1.5 text-xs font-medium shrink-0 transition-colors"
+          aria-label="Clear all selected candidates"
         >
-          Clear
+          <Trash2 className="w-3.5 h-3.5" /> Clear
         </button>
         <button
           onClick={onOpen}
