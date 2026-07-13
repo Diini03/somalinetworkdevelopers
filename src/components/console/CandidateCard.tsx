@@ -1,7 +1,7 @@
 import { Candidate } from "@/types/candidate";
 import { ScoreRing } from "./ScoreRing";
 import { AvailabilityDot } from "./AvailabilityDot";
-import { MapPin, ArrowUpRight } from "lucide-react";
+import { MapPin, ArrowUpRight, Check } from "lucide-react";
 
 interface Props {
   candidate: Candidate;
