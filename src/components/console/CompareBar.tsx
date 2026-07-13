@@ -1,4 +1,4 @@
-import { GitCompare, X } from "lucide-react";
+import { GitCompare, X, Trash2 } from "lucide-react";
 import { Candidate } from "@/types/candidate";
 
 interface Props {
