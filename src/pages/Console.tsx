@@ -34,8 +34,19 @@ const Console = () => {
   const [sort, setSort] = useState<"rank" | "newest" | "az">("rank");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareIds, setCompareIds] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem("snd:compareIds");
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string").slice(0, MAX_COMPARE) : [];
+    } catch { return []; }
+  });
   const [compareOpen, setCompareOpen] = useState(false);
+
+  useEffect(() => {
+    try { localStorage.setItem("snd:compareIds", JSON.stringify(compareIds)); } catch {}
+  }, [compareIds]);
 
   const toggleCompare = (id: string) => {
     setCompareIds((prev) =>
