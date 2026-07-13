@@ -9,7 +9,11 @@ import { ResultHeader } from "@/components/console/ResultHeader";
 import { CandidateCard } from "@/components/console/CandidateCard";
 import { CandidateRow } from "@/components/console/CandidateRow";
 import { CandidateSheet } from "@/components/console/CandidateSheet";
+import { CompareBar } from "@/components/console/CompareBar";
+import { CompareDialog } from "@/components/console/CompareDialog";
 import { SearchX } from "lucide-react";
+
+const MAX_COMPARE = 3;
 
 const norm = (s?: string) => (s || "").toLowerCase();
 
