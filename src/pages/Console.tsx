@@ -34,6 +34,15 @@ const Console = () => {
   const [sort, setSort] = useState<"rank" | "newest" | "az">("rank");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= MAX_COMPARE ? prev : [...prev, id]
+    );
+  };
+  const selectedCandidates = candidates.filter((c) => compareIds.includes(c.id));
 
   useEffect(() => {
     supabase.rpc("get_public_candidates").then(({ data }) => {
