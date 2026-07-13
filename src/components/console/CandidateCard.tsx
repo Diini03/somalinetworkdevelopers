@@ -7,9 +7,12 @@ interface Props {
   candidate: Candidate;
   onOpen: (id: string) => void;
   active?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  selectDisabled?: boolean;
 }
 
-export const CandidateCard = ({ candidate: c, onOpen, active }: Props) => {
+export const CandidateCard = ({ candidate: c, onOpen, active, selected, onToggleSelect, selectDisabled }: Props) => {
   const shown = c.skills.slice(0, 4);
   const extra = Math.max(0, c.skills.length - shown.length);
 
@@ -38,6 +41,22 @@ export const CandidateCard = ({ candidate: c, onOpen, active }: Props) => {
             </span>
           </span>
         </div>
+        {onToggleSelect && (
+          <div
+            role="checkbox"
+            aria-checked={!!selected}
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); if (!selectDisabled || selected) onToggleSelect(c.id); }}
+            onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); e.stopPropagation(); if (!selectDisabled || selected) onToggleSelect(c.id); } }}
+            className={`absolute top-2.5 left-2.5 w-6 h-6 rounded-md border flex items-center justify-center transition-all cursor-pointer ${
+              selected
+                ? "bg-primary border-primary text-primary-foreground"
+                : `bg-background/85 backdrop-blur border-border ${selectDisabled ? "opacity-40 cursor-not-allowed" : "hover:border-primary"}`
+            }`}
+          >
+            {selected && <Check className="w-3.5 h-3.5" />}
+          </div>
+        )}
       </div>
 
       <div className="p-4">
