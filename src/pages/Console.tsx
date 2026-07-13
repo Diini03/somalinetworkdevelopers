@@ -9,7 +9,11 @@ import { ResultHeader } from "@/components/console/ResultHeader";
 import { CandidateCard } from "@/components/console/CandidateCard";
 import { CandidateRow } from "@/components/console/CandidateRow";
 import { CandidateSheet } from "@/components/console/CandidateSheet";
+import { CompareBar } from "@/components/console/CompareBar";
+import { CompareDialog } from "@/components/console/CompareDialog";
 import { SearchX } from "lucide-react";
+
+const MAX_COMPARE = 3;
 
 const norm = (s?: string) => (s || "").toLowerCase();
 
@@ -30,6 +34,15 @@ const Console = () => {
   const [sort, setSort] = useState<"rank" | "newest" | "az">("rank");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [compareIds, setCompareIds] = useState<string[]>([]);
+  const [compareOpen, setCompareOpen] = useState(false);
+
+  const toggleCompare = (id: string) => {
+    setCompareIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= MAX_COMPARE ? prev : [...prev, id]
+    );
+  };
+  const selectedCandidates = candidates.filter((c) => compareIds.includes(c.id));
 
   useEffect(() => {
     supabase.rpc("get_public_candidates").then(({ data }) => {
@@ -179,9 +192,20 @@ const Console = () => {
               </div>
             ) : view === "grid" ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 animate-fade-in">
-                {filtered.map((c) => (
-                  <CandidateCard key={c.id} candidate={c} onOpen={openCandidate} active={routeId === c.id} />
-                ))}
+                {filtered.map((c) => {
+                  const isSel = compareIds.includes(c.id);
+                  return (
+                    <CandidateCard
+                      key={c.id}
+                      candidate={c}
+                      onOpen={openCandidate}
+                      active={routeId === c.id}
+                      selected={isSel}
+                      onToggleSelect={toggleCompare}
+                      selectDisabled={!isSel && compareIds.length >= MAX_COMPARE}
+                    />
+                  );
+                })}
               </div>
             ) : (
               <div className="rounded-xl border border-border overflow-hidden bg-card animate-fade-in">
@@ -192,9 +216,20 @@ const Console = () => {
                   <div className="col-span-2">Availability</div>
                   <div className="col-span-1 text-right">Match</div>
                 </div>
-                {filtered.map((c) => (
-                  <CandidateRow key={c.id} candidate={c} onOpen={openCandidate} active={routeId === c.id} />
-                ))}
+                {filtered.map((c) => {
+                  const isSel = compareIds.includes(c.id);
+                  return (
+                    <CandidateRow
+                      key={c.id}
+                      candidate={c}
+                      onOpen={openCandidate}
+                      active={routeId === c.id}
+                      selected={isSel}
+                      onToggleSelect={toggleCompare}
+                      selectDisabled={!isSel && compareIds.length >= MAX_COMPARE}
+                    />
+                  );
+                })}
               </div>
             )}
           </div>
@@ -202,6 +237,20 @@ const Console = () => {
       </div>
 
       <CandidateSheet candidateId={routeId || null} onClose={closeCandidate} />
+
+      <CompareBar
+        selected={selectedCandidates}
+        max={MAX_COMPARE}
+        onOpen={() => setCompareOpen(true)}
+        onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
+        onClear={() => setCompareIds([])}
+      />
+      <CompareDialog
+        ids={compareIds}
+        open={compareOpen}
+        onOpenChange={setCompareOpen}
+        onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
+      />
     </div>
   );
 };

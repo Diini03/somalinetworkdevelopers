@@ -1,22 +1,42 @@
 import { Candidate } from "@/types/candidate";
 import { ScoreRing } from "./ScoreRing";
 import { AvailabilityDot } from "./AvailabilityDot";
+import { Check } from "lucide-react";
 
 interface Props {
   candidate: Candidate;
   onOpen: (id: string) => void;
   active?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (id: string) => void;
+  selectDisabled?: boolean;
 }
 
-export const CandidateRow = ({ candidate: c, onOpen, active }: Props) => {
+export const CandidateRow = ({ candidate: c, onOpen, active, selected, onToggleSelect, selectDisabled }: Props) => {
   return (
-    <button
+    <div
       onClick={() => onOpen(c.id)}
-      className={`w-full text-left grid grid-cols-12 gap-3 items-center px-4 h-14 border-b border-border transition-colors ${
+      className={`w-full text-left grid grid-cols-12 gap-3 items-center px-4 h-14 border-b border-border transition-colors cursor-pointer ${
         active ? "bg-primary/5" : "hover:bg-surface"
       }`}
     >
       <div className="col-span-4 flex items-center gap-3 min-w-0">
+        {onToggleSelect && (
+          <div
+            role="checkbox"
+            aria-checked={!!selected}
+            tabIndex={0}
+            onClick={(e) => { e.stopPropagation(); if (!selectDisabled || selected) onToggleSelect(c.id); }}
+            onKeyDown={(e) => { if (e.key === " " || e.key === "Enter") { e.preventDefault(); e.stopPropagation(); if (!selectDisabled || selected) onToggleSelect(c.id); } }}
+            className={`w-5 h-5 shrink-0 rounded border flex items-center justify-center transition-all ${
+              selected
+                ? "bg-primary border-primary text-primary-foreground"
+                : `border-border ${selectDisabled ? "opacity-40 cursor-not-allowed" : "hover:border-primary cursor-pointer"}`
+            }`}
+          >
+            {selected && <Check className="w-3 h-3" />}
+          </div>
+        )}
         <img src={c.photo} alt={c.name} className="w-9 h-9 rounded-md object-cover shrink-0" />
         <div className="min-w-0">
           <div className="text-sm font-medium truncate">{c.name}</div>
@@ -39,6 +59,6 @@ export const CandidateRow = ({ candidate: c, onOpen, active }: Props) => {
       <div className="col-span-1 flex justify-end">
         <ScoreRing score={c.aiScore} size={30} />
       </div>
-    </button>
+    </div>
   );
 };
