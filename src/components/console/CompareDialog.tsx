@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Candidate, ExperienceEntry } from "@/types/candidate";
 import { ScoreRing } from "./ScoreRing";
 import { AvailabilityDot } from "./AvailabilityDot";
-import { X, MapPin, GraduationCap } from "lucide-react";
+import { X, MapPin, GraduationCap, ExternalLink } from "lucide-react";
 
 interface Props {
   ids: string[];
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onRemove: (id: string) => void;
+  onOpenProfile?: (id: string) => void;
 }
 
 const mapRow = (row: any): Candidate => ({
@@ -22,7 +23,7 @@ const mapRow = (row: any): Candidate => ({
   aiScore: row.ai_score ?? row.aiScore,
 });
 
-export const CompareDialog = ({ ids, open, onOpenChange, onRemove }: Props) => {
+export const CompareDialog = ({ ids, open, onOpenChange, onRemove, onOpenProfile }: Props) => {
   const [cands, setCands] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -88,8 +89,16 @@ export const CompareDialog = ({ ids, open, onOpenChange, onRemove }: Props) => {
                         {c.aiScore ?? "—"}
                       </div>
                       <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">AI match</div>
-                    </div>
                   </div>
+                  {onOpenProfile && (
+                    <button
+                      onClick={() => { onOpenChange(false); onOpenProfile(c.id); }}
+                      className="mt-3 w-full inline-flex items-center justify-center gap-1.5 h-8 rounded-md border border-border bg-surface hover:bg-accent text-xs font-medium transition-colors"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" /> Open profile
+                    </button>
+                  )}
+                </div>
                 </div>
               ))}
 
