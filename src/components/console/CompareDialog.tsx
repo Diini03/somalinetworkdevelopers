@@ -23,7 +23,7 @@ const mapRow = (row: any): Candidate => ({
   aiScore: row.ai_score ?? row.aiScore,
 });
 
-export const CompareDialog = ({ ids, open, onOpenChange, onRemove }: Props) => {
+export const CompareDialog = ({ ids, open, onOpenChange, onRemove, onOpenProfile }: Props) => {
   const [cands, setCands] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(false);
 
