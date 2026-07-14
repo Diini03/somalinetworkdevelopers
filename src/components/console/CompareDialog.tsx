@@ -237,8 +237,10 @@ export const CompareDialog = ({ ids, open, onOpenChange, onRemove, onOpenProfile
                       <div key={i} className="flex items-start gap-1.5">
                         <Briefcase className="w-3.5 h-3.5 text-muted-foreground mt-0.5 shrink-0" />
                         <div className="min-w-0">
-                          <div className="truncate">{e.role}</div>
-                          <div className="text-xs text-muted-foreground truncate">{e.company}</div>
+                          <div className="truncate">{e.company}</div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {[e.startYear, e.endYear].filter(Boolean).join("–") || ""}
+                          </div>
                         </div>
                       </div>
                     )) : <span className="text-muted-foreground">—</span>}
