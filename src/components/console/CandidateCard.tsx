@@ -43,6 +43,7 @@ export const CandidateCard = ({ candidate: c, onOpen, active, selected, onToggle
         </div>
         {onToggleSelect && (
           <div
+            data-testid="compare-toggle"
             role="checkbox"
             aria-checked={!!selected}
             tabIndex={0}
