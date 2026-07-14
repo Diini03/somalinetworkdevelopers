@@ -261,6 +261,7 @@ const Console = () => {
         open={compareOpen}
         onOpenChange={setCompareOpen}
         onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
+        onOpenProfile={openCandidate}
       />
     </div>
   );
