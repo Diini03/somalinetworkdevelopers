@@ -4,13 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Candidate, ExperienceEntry } from "@/types/candidate";
 import { ScoreRing } from "./ScoreRing";
 import { AvailabilityDot } from "./AvailabilityDot";
-import { X, MapPin, GraduationCap } from "lucide-react";
+import { X, MapPin, GraduationCap, ExternalLink } from "lucide-react";
 
 interface Props {
   ids: string[];
   open: boolean;
   onOpenChange: (v: boolean) => void;
   onRemove: (id: string) => void;
+  onOpenProfile?: (id: string) => void;
 }
 
 const mapRow = (row: any): Candidate => ({
