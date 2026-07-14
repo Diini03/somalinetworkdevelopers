@@ -23,6 +23,7 @@ export const CandidateRow = ({ candidate: c, onOpen, active, selected, onToggleS
       <div className="col-span-4 flex items-center gap-3 min-w-0">
         {onToggleSelect && (
           <div
+            data-testid="compare-toggle"
             role="checkbox"
             aria-checked={!!selected}
             tabIndex={0}
