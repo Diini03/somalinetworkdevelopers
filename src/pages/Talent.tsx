@@ -1,25 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Candidate, ExperienceEntry } from "@/types/candidate";
-import { TopBar } from "@/components/console/TopBar";
+import { SiteHeader } from "@/components/layout/SiteHeader";
+import { CommandPalette } from "@/components/CommandPalette";
 import { FilterRail } from "@/components/console/FilterRail";
 import { FilterSheet } from "@/components/console/FilterSheet";
 import { ResultHeader } from "@/components/console/ResultHeader";
 import { CandidateCard } from "@/components/console/CandidateCard";
 import { CandidateRow } from "@/components/console/CandidateRow";
-import { CandidateSheet } from "@/components/console/CandidateSheet";
 import { CompareBar } from "@/components/console/CompareBar";
-import { CompareDialog } from "@/components/console/CompareDialog";
-import { SearchX } from "lucide-react";
+import { SearchX, Search } from "lucide-react";
 
 const MAX_COMPARE = 3;
-
 const norm = (s?: string) => (s || "").toLowerCase();
 
-const Console = () => {
+const Talent = () => {
   const navigate = useNavigate();
-  const { id: routeId } = useParams();
   const searchRef = useRef<HTMLInputElement>(null);
 
   const [candidates, setCandidates] = useState<Candidate[]>([]);
@@ -34,6 +31,8 @@ const Console = () => {
   const [sort, setSort] = useState<"rank" | "newest" | "az">("rank");
   const [view, setView] = useState<"grid" | "table">("grid");
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [tab, setTab] = useState<"all" | "open" | "top" | "new">("all");
+
   const [compareIds, setCompareIds] = useState<string[]>(() => {
     try {
       const raw = localStorage.getItem("snd:compareIds");
@@ -42,7 +41,6 @@ const Console = () => {
       return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string").slice(0, MAX_COMPARE) : [];
     } catch { return []; }
   });
-  const [compareOpen, setCompareOpen] = useState(false);
 
   useEffect(() => {
     try { localStorage.setItem("snd:compareIds", JSON.stringify(compareIds)); } catch {}
@@ -73,7 +71,6 @@ const Console = () => {
     });
   }, []);
 
-  // Keyboard: `/` to focus search, Esc closes sheet
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === "/" && document.activeElement?.tagName !== "INPUT" && document.activeElement?.tagName !== "TEXTAREA") {
@@ -85,18 +82,9 @@ const Console = () => {
     return () => window.removeEventListener("keydown", handler);
   }, []);
 
-  const skills = useMemo(
-    () => Array.from(new Set(candidates.flatMap((c) => c.skills))).sort(),
-    [candidates]
-  );
-  const locations = useMemo(
-    () => Array.from(new Set(candidates.map((c) => c.location).filter(Boolean))).sort(),
-    [candidates]
-  );
-  const quals = useMemo(
-    () => Array.from(new Set(candidates.map((c) => c.qualification).filter(Boolean))).sort(),
-    [candidates]
-  );
+  const skills = useMemo(() => Array.from(new Set(candidates.flatMap((c) => c.skills))).sort(), [candidates]);
+  const locations = useMemo(() => Array.from(new Set(candidates.map((c) => c.location).filter(Boolean))).sort(), [candidates]);
+  const quals = useMemo(() => Array.from(new Set(candidates.map((c) => c.qualification).filter(Boolean))).sort(), [candidates]);
 
   const filtered = useMemo(() => {
     let list = candidates.filter((c) => {
@@ -121,14 +109,21 @@ const Console = () => {
         if (availability === "passive" && !isPassive) return false;
       }
       if (minScore > 0 && (c.aiScore ?? 0) < minScore) return false;
+
+      // Tabs
+      if (tab === "open") {
+        const a = norm(c.availability);
+        if (!(a.includes("open") || a.includes("available") || a.includes("immediate"))) return false;
+      }
+      if (tab === "top" && (c.aiScore ?? 0) < 80) return false;
       return true;
     });
 
     if (sort === "az") list = [...list].sort((a, b) => a.name.localeCompare(b.name));
-    else if (sort === "rank") list = [...list].sort((a, b) => (b.aiScore ?? 0) - (a.aiScore ?? 0));
-    // newest = RPC default order
+    else if (sort === "rank" || tab === "top") list = [...list].sort((a, b) => (b.aiScore ?? 0) - (a.aiScore ?? 0));
+    if (tab === "new") list = [...list]; // RPC already newest-ish
     return list;
-  }, [candidates, query, activeSkills, activeLocations, activeQuals, availability, minScore, sort]);
+  }, [candidates, query, activeSkills, activeLocations, activeQuals, availability, minScore, sort, tab]);
 
   const toggle = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (v: string) =>
     setter((p) => (p.includes(v) ? p.filter((x) => x !== v) : [...p, v]));
@@ -145,8 +140,8 @@ const Console = () => {
     activeSkills.length + activeLocations.length + activeQuals.length +
     (availability !== "all" ? 1 : 0) + (minScore > 0 ? 1 : 0);
 
-  const openCandidate = (id: string) => navigate(`/dev/${id}`);
-  const closeCandidate = () => navigate("/");
+  const openCandidate = (id: string) => navigate(`/talent/${id}`);
+  const openPalette = () => (window as any).__sndOpenPalette?.();
 
   const railProps = {
     skills, activeSkills, onToggleSkill: toggle(setActiveSkills),
@@ -157,9 +152,52 @@ const Console = () => {
     onClear: clearAll, hasFilters,
   };
 
+  const tabs: { id: typeof tab; label: string; count?: number }[] = [
+    { id: "all", label: "All", count: candidates.length },
+    { id: "open", label: "Open now" },
+    { id: "top", label: "Top ranked" },
+    { id: "new", label: "Recently added" },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <TopBar query={query} onQuery={setQuery} ref={searchRef} />
+      <CommandPalette />
+      <SiteHeader onOpenPalette={openPalette} compareCount={compareIds.length} />
+
+      {/* Sub-header: search + tabs */}
+      <div className="sticky top-14 z-30 bg-background/85 backdrop-blur-md border-b border-border">
+        <div className="px-4 md:px-8 py-3 flex items-center gap-3">
+          <div className="flex-1 max-w-xl relative">
+            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              ref={searchRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search by name, skill, role, city…"
+              className="w-full h-9 pl-9 pr-14 rounded-lg bg-surface border border-border focus:border-primary focus:bg-surface-elevated focus:outline-none focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-muted-foreground/70"
+            />
+            <kbd className="kbd absolute right-2 top-1/2 -translate-y-1/2 hidden sm:inline-flex">/</kbd>
+          </div>
+          <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-thin">
+            {tabs.map((t) => (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`h-8 px-3 rounded-md text-[13px] whitespace-nowrap transition-colors ${
+                  tab === t.id
+                    ? "bg-surface-elevated text-foreground border border-border"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {t.label}
+                {typeof t.count === "number" && tab === t.id && (
+                  <span className="ml-1.5 font-mono text-[10px] text-muted-foreground">{t.count}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="flex flex-1 min-h-0">
         <FilterRail {...railProps} />
@@ -175,7 +213,7 @@ const Console = () => {
             activeFilterCount={activeFilterCount}
           />
 
-          <div className="px-4 md:px-8 py-6">
+          <div className="px-4 md:px-8 py-6 pb-32">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
                 {Array.from({ length: 8 }).map((_, i) => (
@@ -210,7 +248,6 @@ const Console = () => {
                       key={c.id}
                       candidate={c}
                       onOpen={openCandidate}
-                      active={routeId === c.id}
                       selected={isSel}
                       onToggleSelect={toggleCompare}
                       selectDisabled={!isSel && compareIds.length >= MAX_COMPARE}
@@ -234,7 +271,6 @@ const Console = () => {
                       key={c.id}
                       candidate={c}
                       onOpen={openCandidate}
-                      active={routeId === c.id}
                       selected={isSel}
                       onToggleSelect={toggleCompare}
                       selectDisabled={!isSel && compareIds.length >= MAX_COMPARE}
@@ -247,24 +283,15 @@ const Console = () => {
         </main>
       </div>
 
-      <CandidateSheet candidateId={routeId || null} onClose={closeCandidate} />
-
       <CompareBar
         selected={selectedCandidates}
         max={MAX_COMPARE}
-        onOpen={() => setCompareOpen(true)}
+        onOpen={() => navigate("/compare")}
         onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
         onClear={() => setCompareIds([])}
-      />
-      <CompareDialog
-        ids={compareIds}
-        open={compareOpen}
-        onOpenChange={setCompareOpen}
-        onRemove={(id) => setCompareIds((p) => p.filter((x) => x !== id))}
-        onOpenProfile={openCandidate}
       />
     </div>
   );
 };
 
-export default Console;
+export default Talent;

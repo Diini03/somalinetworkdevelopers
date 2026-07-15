@@ -2,83 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
-/* SND v2.1 — Talent Discovery Console
-   Neutral product workbench. Single blue accent.
-   All colors are HSL semantic tokens. */
+/* SND v3.0 — Neo Terminal, refined.
+   Dark-first, mono-accented, technical but warm.
+   All colors are HSL semantic tokens. Never hardcode colors in components. */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --surface: 220 14% 98%;
+    /* Light mirror (kept minimal — dark is the primary experience) */
+    --background: 40 20% 98%;
+    --surface: 40 14% 95%;
     --surface-elevated: 0 0% 100%;
-    --foreground: 222 20% 12%;
+    --foreground: 220 30% 8%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222 20% 12%;
+    --card-foreground: 220 30% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 20% 12%;
+    --popover-foreground: 220 30% 8%;
 
-    --primary: 221 83% 53%;
-    --primary-foreground: 0 0% 100%;
-    --primary-muted: 221 83% 96%;
+    --primary: 152 82% 42%;
+    --primary-foreground: 220 30% 8%;
+    --primary-muted: 152 60% 92%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 20% 12%;
+    --secondary: 40 10% 92%;
+    --secondary-foreground: 220 30% 8%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 46%;
+    --muted: 40 10% 92%;
+    --muted-foreground: 220 8% 42%;
 
-    --accent: 220 14% 94%;
-    --accent-foreground: 222 20% 12%;
+    --accent: 40 10% 90%;
+    --accent-foreground: 220 30% 8%;
 
-    --success: 142 71% 40%;
-    --warning: 38 92% 45%;
+    --success: 152 72% 40%;
+    --warning: 38 92% 48%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 358 78% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --border: 40 8% 86%;
+    --input: 40 8% 86%;
+    --ring: 152 82% 42%;
 
-    --radius: 0.5rem;
+    --link: 199 89% 46%;
+
+    --radius: 0.625rem;
   }
 
   .dark {
-    --background: 222 20% 7%;
-    --surface: 222 18% 10%;
-    --surface-elevated: 222 16% 13%;
-    --foreground: 210 20% 96%;
+    /* Neo terminal — dark default */
+    --background: 220 25% 4%;              /* #07090C */
+    --surface: 220 20% 7%;                 /* #0E1116 */
+    --surface-elevated: 220 18% 10%;       /* #151A21 */
+    --foreground: 210 20% 92%;             /* #E6EAF0 */
 
-    --card: 222 16% 11%;
-    --card-foreground: 210 20% 96%;
+    --card: 220 20% 7%;
+    --card-foreground: 210 20% 92%;
 
-    --popover: 222 16% 13%;
-    --popover-foreground: 210 20% 96%;
+    --popover: 220 18% 10%;
+    --popover-foreground: 210 20% 92%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 222 20% 7%;
-    --primary-muted: 221 60% 18%;
+    --primary: 152 100% 74%;               /* #7CFFB2 mint signal */
+    --primary-foreground: 220 25% 4%;
+    --primary-muted: 152 60% 14%;
 
-    --secondary: 222 14% 15%;
-    --secondary-foreground: 210 20% 96%;
+    --secondary: 220 16% 12%;
+    --secondary-foreground: 210 20% 92%;
 
-    --muted: 222 14% 14%;
-    --muted-foreground: 220 10% 65%;
+    --muted: 220 14% 11%;
+    --muted-foreground: 215 10% 62%;       /* #8A94A3 */
 
-    --accent: 222 14% 17%;
-    --accent-foreground: 210 20% 96%;
+    --accent: 220 14% 14%;
+    --accent-foreground: 210 20% 92%;
 
-    --success: 142 70% 50%;
-    --warning: 38 92% 55%;
+    --success: 152 72% 55%;
+    --warning: 40 92% 60%;
 
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 358 80% 66%;            /* #FF6B6B */
+    --destructive-foreground: 220 25% 4%;
 
-    --border: 222 14% 18%;
-    --input: 222 14% 18%;
-    --ring: 217 91% 60%;
+    --border: 220 12% 14%;                 /* #1F2630 */
+    --input: 220 12% 14%;
+    --ring: 152 100% 74%;
+
+    --link: 199 89% 55%;                   /* #0EA5E9 */
   }
 }
 
@@ -89,12 +95,23 @@
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: '"Inter Tight"', 'Inter Tight', system-ui, sans-serif;
+    font-family: 'Geist', 'Inter', system-ui, -apple-system, sans-serif;
     font-feature-settings: 'ss01', 'cv11';
     font-size: 14px;
+    letter-spacing: -0.005em;
   }
 
   #root { min-height: 100vh; }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+  }
+
+  .font-display {
+    font-family: 'Instrument Serif', 'Times New Roman', serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
 
   ::selection {
     background: hsl(var(--primary) / 0.25);
@@ -104,11 +121,11 @@
 
 @layer utilities {
   .font-mono {
-    font-family: '"JetBrains Mono"', ui-monospace, monospace;
+    font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, monospace;
   }
 
   .kbd {
-    font-family: '"JetBrains Mono"', ui-monospace, monospace;
+    font-family: 'Geist Mono', ui-monospace, monospace;
     font-size: 10.5px;
     padding: 2px 5px;
     border: 1px solid hsl(var(--border));
@@ -121,6 +138,25 @@
   }
 
   .hairline { height: 1px; background: hsl(var(--border)); width: 100%; }
+
+  /* Subtle terminal-grid background used for hero + empty states */
+  .grid-bg {
+    background-image:
+      linear-gradient(hsl(var(--border) / 0.35) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--border) / 0.35) 1px, transparent 1px);
+    background-size: 44px 44px;
+    background-position: -1px -1px;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 0 1px hsl(var(--primary) / 0.35), 0 0 40px -8px hsl(var(--primary) / 0.55);
+  }
+
+  .radial-hero {
+    background:
+      radial-gradient(60% 50% at 50% 0%, hsl(var(--primary) / 0.10), transparent 70%),
+      radial-gradient(40% 30% at 80% 20%, hsl(var(--link) / 0.08), transparent 70%);
+  }
 
   .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
   .scrollbar-thin::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 3px; }
