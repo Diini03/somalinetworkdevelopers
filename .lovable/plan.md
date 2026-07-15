@@ -1,171 +1,97 @@
-# SND v2.1 — Talent Discovery Console
 
-Reframe: this is a **hiring tool**, not a magazine. Recruiters land, search, filter, shortlist, and contact. The editorial gold/serif system is dropped. New system is a **calm, dense, workbench UI** — think Linear × Notion People × Vercel Directory × Perplexity, tuned for scanning candidates fast.
+# SND v3.0 — Full Reboot
 
----
+A complete refresh of the Somali Network Developers talent platform. New identity, new information architecture, richer features, seeded sample data.
 
-## The product loop it must serve
+## Design direction
 
-1. Land → immediately see "search + filters + result grid" above the fold.
-2. Type a query or click a chip → results reflow instantly.
-3. Open a candidate → full profile in a **side sheet** (URL updates), grid stays behind. No full-page navigation for browsing.
-4. Deep link `/dev/:id` opens the same sheet over the directory.
-5. Contact from inside the sheet.
+**Neo Terminal, refined.** Dark-first, mono-accented, technical but warm. Feels like a serious tool for hiring engineers, not a job board.
 
-Only 2 public routes: `/` (the console) and `/dev/:id` (same console with sheet open). Admin unchanged.
+- **Palette (dark default, light mirrored)**
+  - Background `#07090C`, Surface `#0E1116`, Elevated `#151A21`
+  - Foreground `#E6EAF0`, Muted `#8A94A3`, Border `#1F2630`
+  - Primary accent `#7CFFB2` (mint signal) with `#0EA5E9` secondary for links
+  - Warning `#F5B849`, Danger `#FF6B6B`
+- **Typography**
+  - Display / headings: **Instrument Serif** (editorial weight for hero + section labels)
+  - UI / body: **Geist Sans**
+  - Mono: **Geist Mono** (metrics, ids, kbd, code)
+- **Motion & feel**
+  - Micro-transitions only (120–220ms), subtle grid background, hairline dividers, generous whitespace, rounded-lg (10px) surfaces, no gradients except a single soft radial behind the hero.
+- **Semantic tokens rebuilt in `index.css` + `tailwind.config.ts`.** All components refactored to use tokens — no hardcoded colors.
 
----
-
-## Layout — one screen, three regions
+## Information architecture
 
 ```text
-┌───────────────────────────────────────────────────────────────┐
-│  TOP BAR  ── SND logo · ⌘K search ······················ ◐  │
-├──────────────┬────────────────────────────────────────────────┤
-│  FILTER RAIL │  RESULT HEADER  (count · sort · view toggle)   │
-│  (sticky)    ├────────────────────────────────────────────────┤
-│              │                                                │
-│  Skills      │   CANDIDATE GRID  (cards)  ── or ── TABLE      │
-│  Location    │                                                │
-│  Seniority   │                                                │
-│  Available   │                                                │
-│  Score       │                                                │
-│              │                                                │
-└──────────────┴────────────────────────────────────────────────┘
-        Candidate sheet slides in from right on click →
+/                → Landing (new)
+/talent          → Console (browse + filter + compare)
+/talent/:id      → Full profile page (replaces slide-over)
+/compare         → Dedicated compare workspace
+/admin/*         → Kept as-is (login, dashboard, candidates mgmt)
 ```
 
-- **Top bar**: slim, 56px. Wordmark left. Center: a `⌘K` command-style search that expands with recent queries, suggestions, and skill autocomplete. Right: theme toggle + tiny "Admin" dot (unlabeled, keyboard-only).
-- **Filter rail** (left, 260px, sticky, collapsible on mobile → bottom sheet):
-  - Full-text search echo
-  - Skill multi-select (chips + search inside)
-  - Location (chips)
-  - Qualification / seniority (segmented)
-  - Availability (toggle: Open / Passive / All)
-  - AI score slider (min score)
-  - "Clear all" caption link
-- **Result header**: `247 candidates` · sort (`AI match ↓` / `Recently added` / `A–Z`) · view toggle (`Grid | Table | Compact`).
-- **Grid** (default): 3-col responsive cards. Each card = square portrait top, name + role, skill chips (max 4 + "+N"), location, availability dot, **AI match score as a small circular ring** in the top-right corner. Hover = subtle lift + "Open →" affordance. Whole card clickable.
-- **Table view**: dense, one row per candidate — portrait avatar, name, role, top skills, location, score, availability. For power users scanning 100+.
-- **Compact view**: 2-line list, portrait + name/role only.
+Legacy `/dev/:id` and `/directory` redirect to their new equivalents.
 
-## Candidate sheet (the hero interaction)
+## What ships
 
-Sliding right panel, 640px wide desktop / fullscreen mobile. URL becomes `/dev/:id`, `Esc` closes back to `/`.
+### 1. Landing page (`/`)
+- Hero: serif headline "Engineering talent from the Horn.", sub, primary CTA → `/talent`, secondary CTA → `/admin/login`.
+- Live stats strip (candidates count, stacks, cities) pulled from `get_public_candidates`.
+- "How it works" 3-step block, featured candidates carousel (top 4 by aiScore), footer with links.
 
-Contents, top → bottom:
-1. **Header block**: portrait (rounded square), name (semibold sans, not serif), role, location, availability pill, AI match ring.
-2. **Action row**: primary `Contact` button, secondary `View resume`, icon buttons for LinkedIn / GitHub / Portfolio, `Copy link`.
-3. **Tabs**: `Overview` · `Experience` · `Skills` · `Certifications`.
-   - Overview: bio, key skills as chips, quick stats (years exp, projects, last updated).
-   - Experience: clean timeline with company, role, dates, description.
-   - Skills: grouped by category with proficiency bars.
-   - Certifications: thumbnail strip, click to enlarge.
-4. **Contact form** (inside `Contact` action, opens as an inner drawer): name, email, company, message. Uses existing edge function.
+### 2. Rebuilt Console (`/talent`)
+- New topbar: brand mark, global search, command palette hint, theme toggle, "Sign in" link.
+- **Left rail** filters, restyled with grouped sections + counts.
+- Result header with tabs: **All · Open now · Top ranked · Recently added**.
+- Grid + Table + **Compact list** views (new third view).
+- Card redesign: photo left, name + title, stack chips (max 4 + "+N"), availability dot, aiScore ring, quick-add-to-compare, quick-open.
 
-## Empty / loading / error states
+### 3. Rich profile page (`/talent/:id`)
+Replaces the current sheet with a real route:
+- Header: avatar, name, title, location, availability, aiScore ring, actions (Add to compare, Contact, Open CV).
+- Two-column: left = bio + experience timeline + certifications; right = skills matrix, links (LinkedIn/GitHub/Portfolio), qualification, meta.
+- Sticky action bar on scroll.
 
-- Skeleton cards on first load.
-- Empty search: "No candidates match. Try removing filters." with the active filters shown as removable chips.
-- Error: quiet inline banner, retry button.
+### 4. Compare workspace (`/compare`)
+- Promote current dialog to a full page. Keep field selector, side-by-side columns, per-candidate remove, clear-with-confirm, open-profile.
+- Persist selection in localStorage as today.
 
----
+### 5. Command palette (⌘K / Ctrl+K)
+- Jump to candidates by name, run filters ("open now", "in Nairobi"), toggle theme, open admin.
 
-## Visual system reset
+### 6. Seeded sample data
+Wipe existing candidate rows and insert **14 curated sample devs** covering FE/BE/mobile/data/DevOps/design-eng, seniorities junior→staff, cities across Mogadishu / Hargeisa / Nairobi / Addis / remote. Each with realistic skills, 2–3 experience entries, availability, links, and a placeholder avatar. `aiScore` seeded (recomputable later via existing edge function).
 
-Drop editorial noir entirely. Adopt a **neutral product-console** system.
+### 7. Removed / deprecated
+- `Console.tsx` monolith → split into route files.
+- Slide-over `CandidateSheet` → replaced by `/talent/:id` route.
+- `CompareDialog` modal → replaced by `/compare` route (dialog kept as thin wrapper redirecting for now, then deleted).
+- Old redirect routes cleaned up.
 
-### Palette (HSL, semantic tokens in `index.css`)
+## Technical notes
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `--background` | `0 0% 100%` | `222 20% 7%` | app ground |
-| `--surface` | `220 14% 98%` | `222 18% 10%` | rail, cards |
-| `--surface-elevated` | `0 0% 100%` | `222 16% 13%` | sheet, popovers |
-| `--foreground` | `222 20% 12%` | `210 20% 96%` | text |
-| `--muted-foreground` | `220 10% 46%` | `220 10% 65%` | secondary text |
-| `--border` | `220 13% 91%` | `222 14% 18%` | hairlines |
-| `--primary` | `221 83% 53%` | `217 91% 60%` | actions, focus, score ring |
-| `--success` | `142 71% 45%` | `142 70% 50%` | available dot |
-| `--warning` | `38 92% 50%` | `38 92% 55%` | passive dot |
+- **New files**
+  - `src/pages/Landing.tsx`
+  - `src/pages/Talent.tsx` (was `Console.tsx`)
+  - `src/pages/CandidateProfile.tsx`
+  - `src/pages/Compare.tsx`
+  - `src/components/layout/SiteHeader.tsx`, `SiteFooter.tsx`
+  - `src/components/CommandPalette.tsx`
+  - `src/components/candidate/ProfileHeader.tsx`, `ExperienceTimeline.tsx`, `SkillsMatrix.tsx`
+- **Refactored**
+  - `src/index.css` — token overhaul, fonts via `@import` (Google Fonts) + `body` stack.
+  - `tailwind.config.ts` — new color scale, font families, radii.
+  - `src/App.tsx` — new routes, legacy redirects.
+  - Existing `console/*` components restyled to tokens and moved under `src/components/talent/`.
+- **Data**
+  - One migration: `TRUNCATE public.candidates RESTART IDENTITY CASCADE;` then bulk `INSERT` of 14 seed rows. Grants/RLS untouched.
+- **Kept as-is**
+  - Auth, admin routes, RLS, `get_public_candidates` RPC, edge functions (`batch-score-candidates`, `calculate-candidate-score`, `get-cv-signed-url`, `send-candidate-contact-email`).
+  - Supabase client file (auto-gen).
 
-Single accent = **blue**. No gold, no gradients, no glass, no serif display.
-
-### Typography
-
-- **Sans (everything)**: Inter Tight (kept from install).
-- **Mono (numbers, IDs, keyboard shortcuts, code)**: JetBrains Mono (kept).
-- **Removed**: Instrument Serif — uninstall usage, keep import only if needed by shadcn (it isn't).
-- Sizes: display 32/40, h2 22/28, body 14/20, caption 12/16. Tight and consistent.
-
-### Radius & density
-
-- `--radius: 0.5rem` (buttons/inputs/cards). Sheet 0 on the leading edge.
-- Card padding 16px. Rail item height 32px. Table row height 44px.
-
-### Motion
-
-- Sheet slide: 220ms cubic-bezier(0.32, 0.72, 0, 1).
-- Card hover: 120ms lift + border color shift.
-- Filter change: `View Transitions API` if available, else 150ms fade.
-- No marquees, no parallax, no drop caps.
-
----
-
-## File plan
-
-### New
-- `src/pages/Console.tsx` — the single directory + sheet page (replaces `Home.tsx` + `Directory.tsx`).
-- `src/components/console/TopBar.tsx`
-- `src/components/console/CommandSearch.tsx` — ⌘K palette (shadcn `command`).
-- `src/components/console/FilterRail.tsx` — desktop sticky rail.
-- `src/components/console/FilterSheet.tsx` — mobile bottom sheet wrapper for the rail.
-- `src/components/console/ResultHeader.tsx` — count + sort + view toggle.
-- `src/components/console/CandidateCard.tsx` — grid card with score ring.
-- `src/components/console/CandidateRow.tsx` — table row.
-- `src/components/console/CandidateCompact.tsx` — compact list row.
-- `src/components/console/ScoreRing.tsx` — small SVG circular score.
-- `src/components/console/AvailabilityDot.tsx`.
-- `src/components/console/CandidateSheet.tsx` — right-side detail sheet (shadcn `sheet`), URL-synced.
-- `src/components/console/SheetHeader.tsx`, `SheetTabs.tsx`, `ContactDrawer.tsx`.
-- `src/hooks/useCandidates.ts` — fetch + memo filter/sort.
-- `src/hooks/useFilters.ts` — URL-synced filter state (`?q=…&skill=…&sort=…`).
-
-### Rewritten
-- `src/index.css` — replace editorial tokens with product-console tokens; drop `dropcap`, `rule-gold`, `marquee`, `caption` utilities; add `.score-ring`, `.rail-item` if needed.
-- `tailwind.config.ts` — remove `display` font family, keep sans + mono; add `surface`, `surface-elevated`, `success`, `warning` colors.
-- `src/App.tsx` — routes: `/` → `Console`, `/dev/:id` → `Console` (sheet opens via param), keep `/admin/*`, delete redirects to old paths (already handled).
-- `src/pages/DevProfile.tsx` — deleted (folded into sheet).
-- `src/components/InlineContactForm.tsx` — restyled to match new inputs, moved into `ContactDrawer`.
-
-### Deleted
-- `src/pages/Home.tsx`, `src/pages/Directory.tsx`, `src/pages/DevProfile.tsx`.
-- `src/components/editorial/*` (all of them).
-
-### Admin
-- `AdminLayout.tsx` restyled to match console tokens (same left rail pattern), logic untouched.
-- `AdminLogin.tsx` restyled as a plain centered card form.
-
----
-
-## Behaviour details
-
-- Filters live in the URL so results are shareable.
-- Sheet open state also in URL (`/dev/:id`) — deep links open the correct candidate over an empty console on first load; back button closes the sheet without reloading the grid.
-- ⌘K opens the command palette from anywhere.
-- Keyboard: `/` focus search, `j`/`k` next/prev card, `Enter` open, `Esc` close sheet.
-- Mobile: filter rail becomes a `Filters` button that opens a bottom sheet; card grid becomes 1 column; candidate sheet becomes fullscreen.
-- All colors are semantic tokens — no hardcoded hex in components.
-- Score ring color: blue at ≥80, neutral 60–79, muted <60. Uses HSL tokens only.
-
-## Data / backend
-
-No schema, RPC, or edge-function changes. Same `get_public_candidates` and `get_public_candidate` power everything. Contact still uses `send-candidate-contact-email`.
-
-## Out of scope
-
-Shortlists / saved candidates / recruiter accounts — public auth stays disabled per prior decision. If you later want a "saved" feature, we'd add localStorage-only bookmarks; not in this plan.
-
----
+## Out of scope (later)
+- Schema changes to `candidates` (tags, saved shortlists table, employer accounts) — flagged for a v3.1 pass.
+- Rescoring pipeline changes.
+- Email template redesign.
 
 Approve to build.
