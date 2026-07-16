@@ -1,73 +1,87 @@
-# Welcome to your Lovable project
+# Somali Network Developers (SND)
 
-## Project info
+> A collaborative, open-source platform where Somali developers connect, showcase their work, and share insights.
 
-**URL**: https://lovable.dev/projects/2b677701-2f2d-4ad0-b7e7-fe20267cad6f
+![SND preview](./docs/preview.png)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## About
 
-**Use Lovable**
+**SND** is fully open source. The entire source code lives in this repository — anyone can download it, run it locally, fork it, and push improvements back via pull requests.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/2b677701-2f2d-4ad0-b7e7-fe20267cad6f) and start prompting.
+The aim is to build this as a **community project**:
 
-Changes made via Lovable will be committed automatically to this repo.
+- Connect Somali developers across Mogadishu, Hargeisa, Nairobi, Addis, and the diaspora.
+- Share insights, experience, and opportunities.
+- Give employers and collaborators a clean way to discover engineering talent from the Horn.
 
-**Use your preferred IDE**
+If you're a Somali developer (or someone who wants to help the community), you are welcome to contribute — code, design, content, or ideas.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## Live app
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Production**: https://somalinetworkdevelopers.lovable.app
 
-Follow these steps:
+## Tech stack
+
+- **React 18** + **Vite** + **TypeScript**
+- **Tailwind CSS** + **shadcn/ui**
+- **Lovable Cloud** for backend (database, auth, storage, edge functions)
+- **AI ranking** for candidate scoring
+
+## Run locally
+
+Requires Node.js and npm ([install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)).
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone
 git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
 cd <YOUR_PROJECT_NAME>
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 2. Install
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 3. Start dev server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app runs at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Project structure
 
-**Use GitHub Codespaces**
+```
+src/
+  pages/           # Landing, Talent console, Profile, Compare, Admin
+  components/      # UI, console, layout, candidate components
+  integrations/    # Auto-generated backend client
+supabase/
+  functions/       # Edge functions (AI scoring, CV signed URLs, email)
+  migrations/      # Database schema history
+docs/              # Screenshots and assets used by the README
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Contributing
 
-## What technologies are used for this project?
+Contributions are very welcome. The typical flow:
 
-This project is built with:
+1. **Fork** this repository on GitHub.
+2. Create a branch: `git checkout -b feat/your-idea`.
+3. Commit your changes with a clear message.
+4. Push and open a **Pull Request** describing what you changed and why.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+You can also contribute without cloning the repo — open the project in [Lovable](https://lovable.dev) and edit visually. Changes sync back to GitHub automatically.
 
-## How can I deploy this project?
+Ideas that are always appreciated:
 
-Simply open [Lovable](https://lovable.dev/projects/2b677701-2f2d-4ad0-b7e7-fe20267cad6f) and click on Share -> Publish.
+- New candidate profiles (real Somali developers who want to be listed).
+- UI/UX polish and accessibility fixes.
+- Documentation and translations (Somali, Arabic, English).
+- New features: shortlists, messaging, employer accounts, events board.
 
-## Can I connect a custom domain to my Lovable project?
+## Issues & discussions
 
-Yes, you can!
+Found a bug or have an idea? Open a GitHub Issue. For bigger conversations (roadmap, community, design direction), start a Discussion.
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Open source. Free to use, learn from, and build on.
