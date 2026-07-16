@@ -1,6 +1,6 @@
 # Somali Network Developers (SND)
 
-> A collaborative, open-source platform where Somali developers connect, showcase their work, and share insights.
+> A working index of Somali software engineers, designers and data people — vetted, ranked, and reachable in a single click.
 
 ![SND preview](./docs/preview.png)
 
@@ -26,8 +26,27 @@ If you're a Somali developer (or someone who wants to help the community), you a
 
 - **React 18** + **Vite** + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui**
-- **Lovable Cloud** for backend (database, auth, storage, edge functions)
-- **AI ranking** for candidate scoring
+- **Lovable Cloud** for backend (database, auth, storage, edge functions) — powered by Supabase under the hood
+- **AI ranking** (Google Gemini via Lovable AI Gateway) for candidate scoring
+
+## Backend
+
+This project runs on **Lovable Cloud**. Lovable Cloud is a managed backend that uses **Supabase** as its underlying engine — so everything you'd expect from Supabase is there: Postgres database, Row Level Security, Auth, Storage buckets, and Edge Functions.
+
+Practically that means:
+
+- If you fork and run this locally, the client is already wired to the Cloud backend via `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env` (auto-generated).
+- To run your own independent backend, create a new Supabase project (or enable Cloud on your own Lovable fork), then replace the two env vars and re-run the migrations in `supabase/migrations/`.
+
+## Admin access (demo)
+
+The live demo has a shared admin account so anyone exploring the project can see the full admin console:
+
+- **URL**: `/admin/login`
+- **Email**: `asad@gmail.com`
+- **Password**: `111222`
+
+> These credentials are for the public demo only. If you deploy your own instance, create a fresh admin user and remove this account.
 
 ## Run locally
 

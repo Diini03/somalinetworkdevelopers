@@ -329,29 +329,32 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="name">Name *</Label>
-          <Input id="name" value={formData.name} onChange={handleChange} required />
+          <Input id="name" placeholder="e.g. Ayaan Mohamed" value={formData.name} onChange={handleChange} required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="title">Title *</Label>
-          <Input id="title" value={formData.title} onChange={handleChange} required />
+          <Input id="title" placeholder="e.g. Senior Frontend Engineer" value={formData.title} onChange={handleChange} required />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="photo">Photo *</Label>
-        <Input 
-          id="photo" 
-          type="file" 
+        <Input
+          id="photo"
+          type="file"
           accept="image/*"
           onChange={handlePhotoChange}
           required={!candidate && !photoPreview}
         />
+        <p className="text-xs text-muted-foreground">
+          Square headshot, ~400×400px. Tip: use <a href="https://unavatar.io" target="_blank" rel="noreferrer" className="underline">unavatar.io</a> or <a href="https://ui-avatars.com" target="_blank" rel="noreferrer" className="underline">ui-avatars.com</a> if you don't have one.
+        </p>
         {photoPreview && (
           <div className="mt-2">
-            <img 
-              src={photoPreview} 
-              alt="Preview" 
-              className="w-32 h-32 object-cover rounded-lg"
+            <img
+              src={photoPreview}
+              alt="Preview"
+              className="w-32 h-32 object-cover rounded-lg border border-border"
             />
           </div>
         )}
@@ -359,44 +362,45 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
 
       <div className="space-y-2">
         <Label htmlFor="email">Email *</Label>
-        <Input id="email" type="email" value={formData.email} onChange={handleChange} required />
+        <Input id="email" type="email" placeholder="e.g. ayaan@example.com" value={formData.email} onChange={handleChange} required />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="skills">Skills (comma-separated) *</Label>
-        <Input id="skills" value={formData.skills} onChange={handleChange} required />
+        <Input id="skills" placeholder="e.g. React, TypeScript, Node.js, PostgreSQL, Tailwind" value={formData.skills} onChange={handleChange} required />
+        <p className="text-xs text-muted-foreground">Separate each skill with a comma.</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="expected_salary_min">Min Salary *</Label>
-          <Input id="expected_salary_min" type="number" value={formData.expected_salary_min} onChange={handleChange} required />
+          <Label htmlFor="expected_salary_min">Min Salary (USD) *</Label>
+          <Input id="expected_salary_min" type="number" placeholder="e.g. 2500" value={formData.expected_salary_min} onChange={handleChange} required />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="expected_salary_max">Max Salary *</Label>
-          <Input id="expected_salary_max" type="number" value={formData.expected_salary_max} onChange={handleChange} required />
+          <Label htmlFor="expected_salary_max">Max Salary (USD) *</Label>
+          <Input id="expected_salary_max" type="number" placeholder="e.g. 4000" value={formData.expected_salary_max} onChange={handleChange} required />
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="location">Location *</Label>
-          <Input id="location" value={formData.location} onChange={handleChange} required />
+          <Input id="location" placeholder="e.g. Mogadishu, Somalia" value={formData.location} onChange={handleChange} required />
         </div>
         <div className="space-y-2">
           <Label htmlFor="qualification">Qualification *</Label>
-          <Input id="qualification" value={formData.qualification} onChange={handleChange} required />
+          <Input id="qualification" placeholder="e.g. BSc Computer Science, SIMAD University" value={formData.qualification} onChange={handleChange} required />
         </div>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="bio">Bio *</Label>
-        <Textarea id="bio" value={formData.bio} onChange={handleChange} required />
+        <Textarea id="bio" placeholder="Short intro — what they build, what they care about. 2-3 sentences." value={formData.bio} onChange={handleChange} required />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="availability">Availability *</Label>
-        <Input id="availability" value={formData.availability} onChange={handleChange} required />
+        <Input id="availability" placeholder="e.g. Open to work · Full-time · Remote" value={formData.availability} onChange={handleChange} required />
       </div>
 
       {/* CV Upload */}
@@ -557,17 +561,17 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
 
       <div className="space-y-2">
         <Label htmlFor="linkedin">LinkedIn</Label>
-        <Input id="linkedin" value={formData.linkedin} onChange={handleChange} />
+        <Input id="linkedin" placeholder="https://linkedin.com/in/username" value={formData.linkedin} onChange={handleChange} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="github">GitHub</Label>
-        <Input id="github" value={formData.github} onChange={handleChange} />
+        <Input id="github" placeholder="https://github.com/username" value={formData.github} onChange={handleChange} />
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="portfolio">Portfolio</Label>
-        <Input id="portfolio" value={formData.portfolio} onChange={handleChange} />
+        <Input id="portfolio" placeholder="https://your-portfolio.com" value={formData.portfolio} onChange={handleChange} />
       </div>
 
       <div className="flex justify-end gap-2 pt-4">
