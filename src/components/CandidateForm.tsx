@@ -402,8 +402,14 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
         <div className="space-y-2">
           <Label htmlFor="qualification">Qualification *</Label>
           <Input id="qualification" placeholder="e.g. BSc Computer Science, SIMAD University" value={formData.qualification} onChange={handleChange} required />
+          <PresetPicker
+            presets={QUALIFICATION_PRESETS}
+            selected={formData.qualification ? [formData.qualification] : []}
+            onToggle={(label) => setFormData({ ...formData, qualification: formData.qualification === label ? "" : label })}
+          />
         </div>
       </div>
+
 
       <div className="space-y-2">
         <Label htmlFor="bio">Bio *</Label>
