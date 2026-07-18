@@ -369,8 +369,19 @@ export const CandidateForm = ({ candidate, onSuccess, onCancel }: CandidateFormP
       <div className="space-y-2">
         <Label htmlFor="skills">Skills (comma-separated) *</Label>
         <Input id="skills" placeholder="e.g. React, TypeScript, Node.js, PostgreSQL, Tailwind" value={formData.skills} onChange={handleChange} required />
-        <p className="text-xs text-muted-foreground">Separate each skill with a comma.</p>
+        <p className="text-xs text-muted-foreground">Tap presets to add — or type your own separated by commas.</p>
+        <PresetPicker
+          presets={SKILL_PRESETS}
+          selected={formData.skills.split(",").map((s) => s.trim()).filter(Boolean)}
+          onToggle={(label) => {
+            const current = formData.skills.split(",").map((s) => s.trim()).filter(Boolean);
+            const idx = current.findIndex((s) => s.toLowerCase() === label.toLowerCase());
+            const next = idx >= 0 ? current.filter((_, i) => i !== idx) : [...current, label];
+            setFormData({ ...formData, skills: next.join(", ") });
+          }}
+        />
       </div>
+
 
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
