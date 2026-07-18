@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ExperienceEntry } from "@/types/candidate";
 import { Plus, Trash2 } from "lucide-react";
+import { PresetPicker, SKILL_PRESETS, QUALIFICATION_PRESETS } from "@/components/PresetPicker";
 
 interface CandidateFormProps {
   candidate?: any;
