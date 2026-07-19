@@ -11,6 +11,7 @@ import { CandidateCard } from "@/components/console/CandidateCard";
 import { CandidateRow } from "@/components/console/CandidateRow";
 import { CompareBar } from "@/components/console/CompareBar";
 import { SearchX, Search } from "lucide-react";
+import { exportCandidatesCSV, exportCandidatesPDF } from "@/lib/export";
 
 const MAX_COMPARE = 3;
 const norm = (s?: string) => (s || "").toLowerCase();
@@ -211,6 +212,8 @@ const Talent = () => {
             view={view} onView={setView}
             onOpenFilters={() => setMobileFiltersOpen(true)}
             activeFilterCount={activeFilterCount}
+            onExportCSV={() => exportCandidatesCSV(filtered)}
+            onExportPDF={() => exportCandidatesPDF(filtered)}
           />
 
           <div className="px-4 md:px-8 py-6 pb-32">

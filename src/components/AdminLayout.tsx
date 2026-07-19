@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { LayoutDashboard, Users, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ExternalLink, Upload, ShieldCheck } from "lucide-react";
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -35,6 +35,12 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           </Link>
           <Link to="/admin/candidates" className={item("/admin/candidates", location.pathname === "/admin/candidates")}>
             <Users className="w-4 h-4" /> Candidates
+          </Link>
+          <Link to="/admin/candidates/import" className={item("/admin/candidates/import", location.pathname === "/admin/candidates/import")}>
+            <Upload className="w-4 h-4" /> CSV import
+          </Link>
+          <Link to="/admin/roles" className={item("/admin/roles", location.pathname === "/admin/roles")}>
+            <ShieldCheck className="w-4 h-4" /> Roles
           </Link>
         </nav>
         <div className="pt-3 border-t border-border space-y-0.5">
