@@ -46,6 +46,8 @@ const App = () => (
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<ProtectedAdminRoute><AdminDashboard /></ProtectedAdminRoute>} />
             <Route path="/admin/candidates" element={<ProtectedAdminRoute><CandidatesManagement /></ProtectedAdminRoute>} />
+            <Route path="/admin/candidates/import" element={<ProtectedAdminRoute><CandidatesImport /></ProtectedAdminRoute>} />
+            <Route path="/admin/roles" element={<ProtectedAdminRoute><RolesManagement /></ProtectedAdminRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
