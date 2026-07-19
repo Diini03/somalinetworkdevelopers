@@ -36,6 +36,12 @@ export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <Link to="/admin/candidates" className={item("/admin/candidates", location.pathname === "/admin/candidates")}>
             <Users className="w-4 h-4" /> Candidates
           </Link>
+          <Link to="/admin/candidates/import" className={item("/admin/candidates/import", location.pathname === "/admin/candidates/import")}>
+            <Upload className="w-4 h-4" /> CSV import
+          </Link>
+          <Link to="/admin/roles" className={item("/admin/roles", location.pathname === "/admin/roles")}>
+            <ShieldCheck className="w-4 h-4" /> Roles
+          </Link>
         </nav>
         <div className="pt-3 border-t border-border space-y-0.5">
           <Link to="/" className="flex items-center gap-2 h-9 px-3 rounded-md text-sm text-muted-foreground hover:bg-accent hover:text-foreground">
