@@ -13,6 +13,8 @@ import AdminLogin from "./pages/admin/AdminLogin";
 import { ProtectedAdminRoute } from "./components/ProtectedAdminRoute";
 import { AdminDashboard } from "./pages/admin/Dashboard";
 import { CandidatesManagement } from "./pages/admin/CandidatesManagement";
+import { CandidatesImport } from "./pages/admin/CandidatesImport";
+import { RolesManagement } from "./pages/admin/RolesManagement";
 
 const queryClient = new QueryClient();
 
