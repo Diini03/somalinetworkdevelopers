@@ -1,7 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { LayoutDashboard, Users, LogOut, ExternalLink } from "lucide-react";
+import { LayoutDashboard, Users, LogOut, ExternalLink, Upload, ShieldCheck } from "lucide-react";
 
 export const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
