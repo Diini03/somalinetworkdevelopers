@@ -212,6 +212,8 @@ const Talent = () => {
             view={view} onView={setView}
             onOpenFilters={() => setMobileFiltersOpen(true)}
             activeFilterCount={activeFilterCount}
+            onExportCSV={() => exportCandidatesCSV(filtered)}
+            onExportPDF={() => exportCandidatesPDF(filtered)}
           />
 
           <div className="px-4 md:px-8 py-6 pb-32">
