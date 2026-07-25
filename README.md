@@ -1,6 +1,6 @@
 # Somali Network Developers (SND)
 
-> A working index of Somali software engineers, designers and data people — vetted, ranked, and reachable in a single click.
+> A working web index of Somali software engineers, designers and data people — vetted, ranked, and reachable in a single click.
 
 ![SND preview](./docs/preview.png)
 
@@ -20,14 +20,14 @@ The aim is to build this as a **community project**:
 
 - **Production**: https://somalinetworkdevelopers.lovable.app
 
-## Tech stack
+## Tech stack!
 
 - **React 18** + **Vite** + **TypeScript**
 - **Tailwind CSS** + **shadcn/ui**
 - **Lovable Cloud** for backend (database, auth, storage, edge functions) — powered by **Supabase** under the hood
 - **AI ranking** (Google Gemini via Lovable AI Gateway) for candidate scoring
 
-## Backend
+## Backend!
 
 This project runs on **Lovable Cloud**, which is a managed Supabase instance. That means everything you'd expect from Supabase is available: Postgres, Row Level Security, Auth, Storage buckets, and Edge Functions — provisioned automatically.
 
@@ -52,7 +52,7 @@ Server-side secrets used by edge functions (set in the Supabase/Cloud dashboard,
 - `RESEND_API_KEY` — Resend (for contact emails)
 - `SUPABASE_SERVICE_ROLE_KEY` — auto-provisioned; used by admin-only functions
 
-### Database tables
+### Database tables!
 
 Applied via migrations in `supabase/migrations/`:
 
