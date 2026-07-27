@@ -1,6 +1,6 @@
 # Somali Network Developers (SND)
 
-> A working web index of Somali software engineers, designers and data people — vetted, ranked, and reachable in a single click.
+> A working web index of Somali's software engineers, designers and data people — vetted, ranked, and reachable in a single click.
 
 ![SND preview](./docs/preview.png)
 
