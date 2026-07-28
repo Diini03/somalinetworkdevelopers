@@ -6,7 +6,7 @@
 
 ---
 
-## About
+## About SND
 
 **SND** is fully open source. The entire source code lives in this repository — anyone can download it, run it locally, fork it, and push improvements back via pull requests.
 
